@@ -1,0 +1,199 @@
+{% set title = 'Trays' %}
+{% extends 'page.html.twig' %}
+
+{% block styles %}
+{{ parent() }}
+<style>
+{% for tray in trays %}
+{% if tray.color %}
+[data-id="{{ tray.id }}"] { background: {{ tray.color }}; }
+{% endif %}
+{% endfor %}
+
+#content .table {
+    line-height: 3ex;
+    margin-bottom: 20px;
+}
+
+#content .table td,
+#content .table th {
+    padding: 0 4px;
+    text-align: center;
+}
+
+#content .table td.left {
+    text-align: left;
+}
+
+#content .table td.right {
+    text-align: right;
+}
+
+#content .table a {
+    color: inherit;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 3ex;
+    outline: 1px solid #ddd;
+    position: relative;
+    text-decoration: none;
+    width: 3ex;
+    z-index: 1;
+}
+
+#content .table a:active,
+#content .table a:hover {
+    font-weight: bold;
+    outline: 1px solid #999;
+    z-index: 2;
+}
+
+#content .fields {
+    display: table;
+}
+
+#content .fields > div {
+    display: table-row;
+}
+
+#content .fields > div > * {
+    display: table-cell;
+}
+
+#content .fields > div > label {
+    padding-right: 4px;
+}
+
+@media print {
+    [aria-label="breadcrumb"],
+    footer,
+    form,
+    header {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ parent() }}
+{% if auth.is('admin') %}
+<script>
+var cells = document.querySelectorAll('.table a');
+
+Array.prototype.forEach.call(
+    cells,
+    function (element) {
+        element.addEventListener('click', function (event) {
+            var fields = [
+                'id',
+                'color',
+                'name',
+                'length',
+                'width',
+                'height',
+                'pershelf',
+                'total'
+            ];
+
+            fields.forEach(function(field) {
+                var element = document.getElementById(field);
+
+                element.value = event.target.dataset[field];
+            });
+
+            document.getElementById('name').focus();
+            event.preventDefault();
+        });
+    }
+);
+</script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<nav aria-label="breadcrumb">
+    <ol class="list-breadcrumb">
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li aria-current="page">Catalogs</li>
+    </ol>
+</nav>
+
+{% for message in messages %}
+<div class="alert alert-{{ message.level }}">{{ message.message }}</div>
+{% endfor %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Length</th>
+            <th>Width</th>
+            <th>Height</th>
+            <th>Per Shelf</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for tray in trays %}
+        <tr>
+            <td><a{% if auth.is('admin') %} href="#"{% endif %} data-id="{{ tray.id }}" data-color="{{ tray.color }}" data-name="{{ tray.name }}" data-length="{{ tray.length }}" data-width="{{ tray.width }}" data-height="{{ tray.height }}" data-pershelf="{{ tray.per_shelf }}" data-total="{{ tray.total }}">{{ tray.id }}</a></td>
+{% if not tray.length and not tray.width and not tray.height %}
+            <td class="left" colspan="4">{{ tray.name }}</td>
+{% else %}
+            <td class="left">{{ tray.name }}</td>
+            <td class="right">{{ tray.length ? tray.fractionLength : '' }}</td>
+            <td class="right">{{ tray.width ? tray.fractionWidth : '' }}</td>
+            <td class="right">{{ tray.height ? tray.fractionHeight : '' }}</td>
+{% endif %}
+            <td>{{ tray.per_shelf }}</td>
+            <td class="right">{{ tray.total ? tray.total|number_format : '' }}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% if auth.is('admin') %}
+<form method="post" action="{{ url_for('trays') }}">
+    <h2>Manage Tray</h2>
+    <div class="fields">
+        <div>
+            <label for="id">ID:</label>
+            <div><input type="text" id="id" name="id" size="1" maxlength="1"></div>
+        </div>
+        <div>
+            <label for="color">Color:</label>
+            <div><input type="color" id="color" name="color" value="#ffffff"></div>
+        </div>
+        <div>
+            <label for="name">Name:</label>
+            <div><input type="text" id="name" name="name" size="20" maxlength="255"></div>
+        </div>
+        <div>
+            <label for="length">Length:</label>
+            <div><input type="number" id="length" name="length" min="0.125" max="999" step="0.125"> inches</div>
+        </div>
+        <div>
+            <label for="width">Width:</label>
+            <div><input type="number" id="width" name="width" min="0.125" max="999" step="0.125"> inches</div>
+        </div>
+        <div>
+            <label for="height">Height:</label>
+            <div><input type="number" id="height" name="height" min="0.125" max="999" step="0.125"> inches</div>
+        </div>
+        <div>
+            <label for="pershelf">Per Shelf:</label>
+            <div><input type="number" id="pershelf" name="per_shelf" min="1" max="99" step="1"></div>
+        </div>
+        <div>
+            <label for="total">Total:</label>
+            <div><input type="number" id="total" name="total" min="1" max="9999" step="1"></div>
+        </div>
+    </div>
+    <input type="submit" name="update" value="Update" class="button button-primary">
+    <input type="submit" name="remove" value="Remove" class="button">
+</form>
+{% endif %}
+
+{% endblock %}

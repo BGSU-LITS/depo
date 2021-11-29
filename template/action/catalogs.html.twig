@@ -1,0 +1,99 @@
+{% set title = 'Catalogs' %}
+{% extends 'page.html.twig' %}
+
+{% block styles %}
+{{ parent() }}
+<style>
+#content .table {
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ parent() }}
+{% if auth.is('admin') %}
+<script>
+var cells = document.querySelectorAll('.table a[data-id');
+
+Array.prototype.forEach.call(
+    cells,
+    function (element) {
+        element.addEventListener('click', function (event) {
+            var fields = [
+                'id',
+                'name',
+                'url'
+            ];
+
+            fields.forEach(function(field) {
+                var element = document.getElementById(field);
+
+                element.value = event.target.dataset[field];
+            });
+
+            document.getElementById('name').focus();
+            event.preventDefault();
+        });
+    }
+);
+</script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<nav aria-label="breadcrumb">
+    <ol class="list-breadcrumb">
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li aria-current="page">Catalogs</li>
+    </ol>
+</nav>
+
+{% for message in messages %}
+<div class="alert alert-{{ message.level }}">{{ message.message }}</div>
+{% endfor %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>URL</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for catalog in catalogs %}
+        <tr>
+            <td>
+                <a{% if auth.is('admin') %} href="#"{% endif %} data-id="{{ catalog.id }}" data-name="{{ catalog.name }}" data-url="{{ catalog.url }}">{{ catalog.id }}</a>
+            </td>
+            <td>{{ catalog.name }}</td>
+            <td><a href="{{ catalog.url }}">{{ catalog.url }}</a></td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% if auth.is('admin') %}
+<form method="post" action="{{ url_for('catalogs') }}">
+    <h2>Manage Catalog</h2>
+    <div class="fields">
+        <div>
+            <label for="id">ID:</label>
+            <div><input type="text" id="id" name="id" size="8" maxlength="8"></div>
+        </div>
+        <div>
+            <label for="name">Name:</label>
+            <div><input type="text" id="name" name="name" size="64" maxlength="255"></div>
+        </div>
+        <div>
+            <label for="name">URL:</label>
+            <div><input type="url" id="url" name="url" size="64" maxlength="255"></div>
+        </div>
+    </div>
+    <input type="submit" name="update" value="Update" class="button button-primary">
+    <input type="submit" name="remove" value="Remove" class="button">
+</form>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,347 @@
+{% set title = (module ? 'Module ' ~ module ~ (side ? ' Side ' ~ side : '') : 'Shelves') %}
+{% extends 'page.html.twig' %}
+
+{% block styles %}
+{{ parent() }}
+<style>
+.grid {
+    border-collapse: collapse;
+    line-height: 1;
+    margin: 0 0 20px 0;
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.grid th {
+    border-right: 1px solid #ddd;
+    padding: 0  2px 0 0;
+}
+
+.grid thead th {
+    border-bottom: 1px solid #ddd;
+    border-right: none;
+    padding: 0 0 2px 0;
+}
+
+.grid th[colspan],
+.grid th[rowspan] {
+    border: none;
+    font-size: 1.25em;
+    line-height: 1.5;
+}
+
+.grid td {
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 0;
+}
+
+.grid a,
+.grid a:link,
+.grid a:visited {
+    color: inherit;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 3ex;
+    text-decoration: none;
+    width: 3ex;
+}
+
+.grid a.active:active,
+.grid a.active:hover {
+    font-weight: bold;
+}
+
+.grid a.active {
+    outline: 1px solid #999;
+}
+
+.rotate {
+    transform: rotate(180deg);
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+}
+
+.sidebar > * {
+    margin-bottom: 8px;
+}
+
+.sidebar .sidebar-left .active {
+    font-weight: bold;
+}
+
+{% for tray in trays %}
+{% if tray.color %}
+[data-trayid="{{ tray.id }}"] { background: {{ tray.color }}; }
+{% endif %}
+{% endfor %}
+[data-trayid="?"] { background: #666; color: #fff !important; }
+
+#content .table {
+    line-height: 3ex;
+}
+
+#content .table th[data-trayid] {
+    box-sizing: content-box;
+    font-weight: normal;
+    padding: 0;
+    text-align: center;
+    width: 3ex;
+}
+
+#content .table td {
+    padding: 0 4px;
+}
+
+@media print {
+    [aria-label="breadcrumb"],
+    footer,
+    form,
+    h2,
+    header,
+    .grid tbody tr:last-child,
+    .grid td:last-child,
+    .grid th:last-child,
+    .sidebar-left > * {
+        display: none !important;
+    }
+
+    .grid {
+        page-break-inside: avoid;
+    }
+
+    .grid th[colspan] {
+        display: table-cell!important;
+    }
+
+    .sidebar {
+        display: block !important;
+    }
+
+    .sidebar-left {
+        background: transparent !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    .table {
+        display: table !important;
+        page-break-inside: avoid;
+    }
+
+    .table th,
+    .table td {
+        border: 1px solid #ddd !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ parent() }}
+<script type="text/javascript" src="https://lib.bgsu.edu/template/1.3.2/tippy.js"></script>
+<script>
+bgsu_tippy.setup(".grid a", {arrow: true, placement: "top"});
+
+var cells = document.querySelectorAll('.grid a');
+
+Array.prototype.forEach.call(
+    cells,
+    function (element) {
+{% if auth.is('admin') %}
+        element.addEventListener('click', function (event) {
+            var section = document.getElementById('section');
+            var shelf = document.getElementById('shelf');
+            var tray_id = document.getElementById('tray_id');
+
+            section.value = event.target.dataset.section;
+            shelf.value = event.target.dataset.shelf;
+            tray_id.value = event.target.dataset.trayid;
+
+            tray_id.focus();
+            event.preventDefault();
+        });
+{% endif %}
+
+        element.addEventListener('mouseover', function (event) {
+            Array.prototype.forEach.call(
+                cells,
+                function (cell) {
+                    cell.classList.remove('active');
+
+                    if (
+                        cell.dataset.section == event.target.dataset.section ||
+                        cell.dataset.shelf == event.target.dataset.shelf
+                    ) {
+                        cell.classList.add('active');
+                    }
+                }
+            );
+        });
+    }
+);
+
+document.querySelector('.grid').addEventListener('mouseout', function (event) {
+    Array.prototype.forEach.call(
+        cells,
+        function (cell) {
+            cell.classList.remove('active');
+        }
+    );
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<nav aria-label="breadcrumb">
+    <ol class="list-breadcrumb">
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li>{% if module %}<li><a href="{{ url_for('shelves') }}">Shelves</a></li>{% if side %}<li><a href="{{ url_for('shelves', {'module': module}) }}">Module {{ module }}</a></li><li aria-current="page">Side {{ side }}</li>{% else %}<li aria-current="page">Module {{ module }}</li>{% endif %}{% else %}<li aria-current="page">Shelves</li>{% endif %}
+    </ol>
+</nav>
+
+{% if shelves %}
+<div class="sidebar">
+<div>
+
+<h2>Sections and Shelves</h2>
+
+{% for message in messages %}
+<div class="alert alert-{{ message.level }}">{{ message.message }}</div>
+{% endfor %}
+
+<table class="grid">
+    <thead>
+        <tr>
+            <th rowspan="2" colspan="2"></th>
+            <th colspan="{{ sections|length + 1 }}">Sections</th>
+        </tr>
+        <tr>
+{% for section in sections %}
+            <th>{{ section }}</th>
+{% endfor %}
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+{% for shelf in shelves|keys %}
+        <tr>
+{% if loop.first %}
+            <th rowspan="{{ shelves|length + 1 }}"><span class="rotate">Shelves</span></th>
+{% endif %}
+            <th>{{ shelf }}</th>
+{% for section in sections %}
+            <td><a{% if auth.is('admin') %} href="#"{% endif %} data-section="{{ section }}" data-shelf="{{ shelf }}" data-trayid="{{ shelves[shelf][section] ?: (missing[shelf][section] ? '?' : '') }}" title="Section {{ section }} Shelf {{ shelf }}{{ shelves[shelf][section] ? ': ' ~ trays[shelves[shelf][section]].name : (missing[shelf][section] ? ': ' ~ missing[shelf][section] ~ ' Item' ~ (missing[shelf][section] > 1 ? 's' : '') : '') }}">{{ shelves[shelf][section] ?: (missing[shelf][section] ? '?' : '&nbsp;') }}</a></td>
+{% if loop.last %}
+            <td><a{% if auth.is('admin') %} href="#"{% endif %} data-section="{{ "%02d"|format(1 + section) }}" data-shelf="{{ shelf }}" data-trayid="{{ missing[shelf][1 + section] ? '?' : '' }}" title="Section {{ "%02d"|format(1 + section) }} Shelf {{ shelf }}{{ missing[1 + section][shelf] ? ': ' ~ missing[shelf][1 + section] ~ ' Item' ~ (missing[shelf][1 + section] > 1 ? 's' : '') : '' }}">{{ missing[shelf][1 + section] ? '?' : '&nbsp;' }}</a></td>
+{% endif %}
+{% endfor %}
+        </tr>
+{% if loop.last %}
+        <tr>
+            <th></th>
+{% for section in sections %}
+            <td><a{% if auth.is('admin') %} href="#"{% endif %} data-section="{{ section }}" data-shelf="{{ "%02d"|format(1 + shelf) }}" data-trayid="{{ missing[1 + shelf][section] ? '?' : '' }}" title="Section {{ section }} Shelf {{ "%02d"|format(1 + shelf) }}{{ missing[section][1 + shelf] ? ': ' ~ missing[1 + shelf][section] ~ ' Item' ~ (missing[1 + shelf][section] > 1 ? 's' : '') : '' }}">{{ missing[1 + shelf][section] ? '?' : '&nbsp;' }}</a></td>
+{% if loop.last %}
+            <td><a{% if auth.is('admin') %} href="#"{% endif %} data-section="{{ "%02d"|format(1 + section) }}" data-shelf="{{ "%02d"|format(1 + shelf) }}" data-trayid="{{ missing[1 + shelf][1 + section] ? '?' : '' }}" title="Section {{ "%02d"|format(1 + section) }} Shelf {{ "%02d"|format(1 + shelf) }}{{ missing[1 + section][1 + shelf] ? ': ' ~ missing[1 + shelf][1 + section] ~ ' Item' ~ (missing[1 + shelf][1 + section] > 1 ? 's' : '') : '' }}">{{ missing[1 + shelf][1 + section] ? '?' : '&nbsp;' }}</a></td>
+{% endif %}
+{% endfor %}
+        </tr>
+{% endif %}
+{% endfor %}
+    </tbody>
+</table>
+
+{% if auth.is('admin') %}
+<form method="post" action="{{ url_for('shelves') }}">
+    <h3>Update Tray</h3>
+    <input type="hidden" name="module" value="{{ module }}">
+    <input type="hidden" name="side" value="{{ side }}">
+    <ul class="list-inline">
+        <li>
+            <label for="section">Section:</label>
+            <select id="section" name="section">
+{% for section in sections %}
+                <option value="{{ section }}">{{ section }}</option>
+{% if loop.last %}
+                <option value="{{ "%02d"|format(1 + section) }}">{{ "%02d"|format(1 + section) }}</option>
+{% endif %}
+{% endfor %}
+            </select>
+        </li>
+        <li>
+            <label for="shelf">Shelf:</label>
+            <select id="shelf" name="shelf">
+{% for shelf in shelves|keys %}
+                <option value="{{ shelf }}">{{ shelf }}</option>
+{% if loop.last %}
+                <option value="{{ "%02d"|format(1 + shelf) }}">{{ "%02d"|format(1 + shelf) }}</option>
+{% endif %}
+{% endfor %}
+            </select>
+        </li>
+        <li>
+            <label for="tray_id">Tray:</label>
+            <select id="tray_id" name="tray_id">
+                <option value=""></option>
+{% for tray in trays %}
+                <option value="{{ tray.id }}">{{ tray.id }}</option>
+{% endfor %}
+            </select>
+        </li>
+        <li>
+            <input type="submit" value="Update" class="button button-primary button-small">
+        </li>
+    </ul>
+</form>
+{% endif %}
+
+</div>
+<div class="sidebar-left">
+{% endif %}
+
+{% if modules %}
+{% if not sides or shelves %}
+<h2 class="sidebar-title">Modules</h2>
+<ul>
+{% for value in modules %}
+    <li><a href="{{ url_for('shelves', {'module': value}) }}"{% if module == value %} class="active"{% endif %}>Module {{ value }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+{% else %}
+<div class="alert alert-failure">
+    No shelves are available.
+</div>
+{% endif %}
+
+{% if sides %}
+<h2 class="sidebar-title">Sides</h2>
+<ul>
+{% for value in sides %}
+    <li><a href="{{ url_for('shelves', {'module': module, 'side': value}) }}"{% if side == value %} class="active"{% endif %}>Side {{ value }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if shelves %}
+<h2 class="sidebar-title">Trays</h2>
+<table class="table">
+{% for tray in trays %}
+    <tr>
+        <th data-trayid="{{ tray.id }}">{{ tray.id }}</th>
+        <td>{{ tray.fractionName }}</td>
+    </tr>
+{% endfor %}
+    <tr>
+        <th data-trayid="?">?</th>
+        <td>Has items but no tray type</td>
+    </tr>
+</table>
+
+</div>
+</div>
+{% endif %}
+
+{% endblock %}
