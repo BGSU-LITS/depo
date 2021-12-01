@@ -6,12 +6,16 @@ use Lits\Action\CatalogsAction;
 use Lits\Action\IndexAction;
 use Lits\Action\ShelvesAction;
 use Lits\Action\TraysAction;
+use Lits\Command\ItemNewestCommand;
+use Lits\Command\ItemStateCommand;
 use Lits\Command\ProcessCommand;
 use Lits\Command\TrayIdsCommand;
 use Lits\Framework;
 
 return function (Framework $framework): void {
     $framework->app()->get('/process', ProcessCommand::class);
+    $framework->app()->get('/item_newest', ItemNewestCommand::class);
+    $framework->app()->get('/item_state', ItemStateCommand::class);
     $framework->app()->get('/tray_ids', TrayIdsCommand::class);
 
     $framework->app()

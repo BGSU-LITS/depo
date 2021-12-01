@@ -1,7 +1,62 @@
-{% set title = 'Index' %}
 {% extends 'page.html.twig' %}
+
+{% block styles %}
+{{ parent() }}
+<style>
+#content .table td {
+    text-align: right;
+}
+
+#content .table,
+#content .table .grand td,
+#content .table .grand th {
+    border-top: 2px solid #ccc;
+    border-bottom: 2px solid #ccc;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 {{ parent() }}
-<p>Hello, World!</p>
+
+<h2>Current Holdings</h2>
+<table class="table">
+<tbody>
+<tr>
+    <th rowspan="2">Bowling Green State University</th>
+    <th>Local</th>
+    <td>{{ total_catalog['bgsu']|number_format }}</td>
+    <td>{{ (total_catalog['bgsu'] / total * 100)|round(1) }}%</td>
+</tr>
+<tr>
+    <th>OHDEP</th>
+    <td>{{ total_location['ohdep']['odnw1']|number_format }}</td>
+    <td>{{ (total_location['ohdep']['odnw1'] / total * 100)|round(1) }}%</td>
+</tr>
+<tr>
+    <th rowspan="2">University of Toledo</th>
+    <th>Local</th>
+    <td>{{ total_catalog['ut']|number_format }}</td>
+    <td>{{ (total_catalog['ut'] / total * 100)|round(1) }}%</td>
+</tr>
+<tr>
+    <th>OHDEP</th>
+    <td>{{ total_location['ohdep']['odnw2']|number_format }}</td>
+    <td>{{ (total_location['ohdep']['odnw2'] / total * 100)|round(1) }}%</td>
+</tr>
+<tr>
+    <th>OhioLINK Depository System</th>
+    <th>OHDEP</th>
+    <td>{{ (total_location['ohdep']['odnw3'] + total_location['ohdep']['odnwd'])|number_format }}</td>
+    <td>{{ ((total_location['ohdep']['odnw3'] + total_location['ohdep']['odnwd']) / total * 100)|round(1) }}%</td>
+</tr>
+<tr class="grand">
+    <th colspan="2">Total</th>
+    <td>{{ total|number_format }}</td>
+    <td>100%</td>
+</tr>
+</tbody>
+</table>
+<p>As of {{ updated|date('F j, Y') }}</p>
+
 {% endblock %}

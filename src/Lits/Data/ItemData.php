@@ -23,6 +23,8 @@ final class ItemData extends DatabaseData
     public ?int $revision = null;
     public ?string $status = null;
     public ?string $message = null;
+    public bool $newest = false;
+    public ?string $state = null;
 
     /** @var string[] */
     public array $barcodes = [];
@@ -43,21 +45,19 @@ final class ItemData extends DatabaseData
     ): self {
         $item = new static($settings, $database);
 
-        if (isset($row['location'])) {
-            $item->location = \trim($row['location']);
+        if (
+            !isset($row['location']) ||
+            !isset($row['record']) ||
+            !isset($row['created']) ||
+            !isset($row['updated'])
+        ) {
+            throw new InvalidDataException('Row does not contain valid data');
         }
 
-        if (isset($row['record'])) {
-            $item->record = \trim($row['record']);
-        }
-
-        if (isset($row['created'])) {
-            $item->created = self::parseDate($row['created']);
-        }
-
-        if (isset($row['updated'])) {
-            $item->updated = self::parseDate($row['updated']);
-        }
+        $item->location = \trim($row['location']);
+        $item->record = \trim($row['record']);
+        $item->created = self::parseDate($row['created']);
+        $item->updated = self::parseDate($row['updated']);
 
         if (isset($row['revision'])) {
             $item->revision = (int) $row['revision'];
@@ -69,6 +69,14 @@ final class ItemData extends DatabaseData
 
         if (isset($row['message'])) {
             $item->message = self::parseCode($row['message']);
+        }
+
+        if (isset($row['newest'])) {
+            $item->newest = (bool) $row['newest'];
+        }
+
+        if (isset($row['state'])) {
+            $item->state = \trim($row['state']);
         }
 
         if (isset($row['barcodes'])) {
@@ -103,6 +111,8 @@ final class ItemData extends DatabaseData
                 'revision' => $this->revision,
                 'status' => $this->status,
                 'message' => $this->message,
+                'newest' => $this->newest,
+                'state' => $this->state,
             ],
             'id'
         );
@@ -137,6 +147,59 @@ final class ItemData extends DatabaseData
 
         $this->place->item_id = $this->id;
         $this->place->save();
+    }
+
+    public static function setNewest(Database $database): int
+    {
+        $database->pdo->exec('
+            create temporary table
+                newest
+            select
+                catalog_id,
+                record,
+                max(updated) as updated
+            from
+                item
+            group by
+                catalog_id,
+                record;
+        ');
+
+        return (int) $database->pdo->exec('
+            update
+                item,
+                newest
+            set
+                item.newest = (item.updated = newest.updated)
+            where
+                item.catalog_id = newest.catalog_id and
+                item.record = newest.record;
+        ');
+    }
+
+    public static function setState(
+        Settings $settings,
+        Database $database
+    ): int {
+        $states = StateData::all($settings, $database);
+        $clauses = [];
+
+        foreach ($states as $state) {
+            $clauses[] = 'if (catalog_id = "' .
+                $state->catalog_id . '" and ' .
+                $state->field . ' = "' .
+                $state->value . '", "' .
+                $state->state . '"';
+        }
+
+        return (int) $database->pdo->exec('
+            update
+                item
+            set
+                item.state = ' .
+                    \implode(', ', $clauses) . ', null' .
+                    \str_repeat(')', \count($clauses)) . '
+        ');
     }
 
     private static function parseCode(string $code): ?string
