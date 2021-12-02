@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Lits\Action\CatalogsAction;
 use Lits\Action\IndexAction;
+use Lits\Action\MonthAction;
 use Lits\Action\ShelvesAction;
 use Lits\Action\TraysAction;
 use Lits\Command\ItemNewestCommand;
@@ -29,6 +30,10 @@ return function (Framework $framework): void {
     $framework->app()
         ->post('/catalogs', [CatalogsAction::class, 'post'])
         ->setArgument('auth', 'admin');
+
+    $framework->app()
+        ->get('/month', MonthAction::class)
+        ->setName('month');
 
     $framework->app()
         ->get('/shelves[/{module}[/{side}]]', ShelvesAction::class)

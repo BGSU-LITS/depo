@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 use Lits\Config\CsvConfig;
+use Lits\Config\DepoConfig;
 use Lits\Config\TemplateConfig;
 use Lits\Framework;
 
 return function (Framework $framework): void {
     $framework->addConfig('csv', new CsvConfig());
+    $framework->addConfig('depo', new DepoConfig());
 
     $settings = $framework->settings();
     assert($settings['template'] instanceof TemplateConfig);
