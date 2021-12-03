@@ -15,6 +15,8 @@ use stdClass;
 use function Latitude\QueryBuilder\alias;
 use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
+use function Latitude\QueryBuilder\group;
+use function Latitude\QueryBuilder\on;
 
 final class ShelvesAction extends AuthAction
 {
@@ -235,17 +237,23 @@ final class ShelvesAction extends AuthAction
         $statement = $this->database->execute(
             $this->database->query
                 ->select(
-                    'section',
-                    'shelf',
+                    'place.section',
+                    'place.shelf',
                     alias(func('COUNT', '*'), 'total')
                 )
-                ->from('place')
-                ->where(field('module')->eq($module))
-                ->andWhere(field('side')->eq($side))
-                ->andWhere(field('tray_id')->isNull())
-                ->groupBy('section', 'shelf')
-                ->orderBy('shelf', 'ASC')
-                ->orderBy('section', 'ASC')
+                ->from('item')
+                ->join('place', on('item.id', 'place.item_id'))
+                ->where(field('item.newest')->eq(true))
+                ->andWhere(group(
+                    field('item.state')->isNull()->or(
+                    field('item.state')->notEq('deaccession'))
+                ))
+                ->andWhere(field('place.module')->eq($module))
+                ->andWhere(field('place.side')->eq($side))
+                ->andWhere(field('place.tray_id')->isNull())
+                ->groupBy('place.section', 'place.shelf')
+                ->orderBy('place.shelf', 'ASC')
+                ->orderBy('place.section', 'ASC')
         );
 
         $result = [];
