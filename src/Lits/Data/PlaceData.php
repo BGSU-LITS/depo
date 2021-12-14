@@ -28,6 +28,8 @@ final class PlaceData extends DatabaseData
         $/x
     ';
 
+    public const PATTERN_BARCODE_MYSQL = '^8[0-9]{9}([0-9]{2}.?)?$';
+
     public ?int $item_id = null;
     public ?int $tray_id = null;
     public string $module;

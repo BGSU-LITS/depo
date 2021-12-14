@@ -336,12 +336,18 @@ document.querySelector('.grid').addEventListener('mouseout', function (event) {
 {% endfor %}
     <tr>
         <th data-trayid="?">?</th>
-        <td>Has items but no tray type</td>
+        <td><a href="{{ url_for('shelves/missing') }}">Has items but no tray type</a></td>
     </tr>
 </table>
 
 </div>
 </div>
+{% else %}
+<h2>Trays</h2>
+<ul>
+<li><a href="{{ url_for('shelves/missing') }}">View items missing tray type</a></li>
+</ul>
+
 {% endif %}
 
 {% endblock %}
