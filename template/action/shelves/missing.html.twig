@@ -1,0 +1,31 @@
+{% set title = 'Items Missing Tray Type' %}
+{% extends 'page.html.twig' %}
+
+{% block styles %}
+{{ parent() }}
+<style>
+#content .table {
+    width: 100%
+}
+
+#content .table td.table_key_catalog_id {
+    text-transform: uppercase;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+<nav aria-label="breadcrumb">
+    <ol class="list-breadcrumb">
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li><a href="{{ url_for('shelves') }}">Shelves</a></li><li aria-current="page">{{ title }}</li>
+    </ol>
+</nav>
+
+{{ include('database/pagination.html.twig') }}
+{{ include('database/table.html.twig') }}
+{{ include('database/pagination.html.twig') }}
+
+{% endblock %}
