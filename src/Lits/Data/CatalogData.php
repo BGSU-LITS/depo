@@ -69,13 +69,23 @@ final class CatalogData extends DatabaseData
      */
     public function save(): void
     {
-        $this->remove();
-
-        $this->database->insert('catalog', [
-            'id' => $this->id,
-            'name' => $this->name,
-            'url' => $this->url,
-        ]);
+        try {
+            $this->database->insert('catalog', [
+                'id' => $this->id,
+                'name' => $this->name,
+                'url' => $this->url,
+            ]);
+        } catch (DuplicateInsertException $exception) {
+            $this->database->update(
+                'catalog',
+                [
+                    'name' => $this->name,
+                    'url' => $this->url,
+                ],
+                'id',
+                $this->id,
+            );
+        }
     }
 
     /** @return array<string, self> */
