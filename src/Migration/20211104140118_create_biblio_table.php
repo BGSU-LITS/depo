@@ -8,7 +8,7 @@ use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 
-class CreateBiblioTable extends AbstractMigration
+final class CreateBiblioTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
     protected function up(): void

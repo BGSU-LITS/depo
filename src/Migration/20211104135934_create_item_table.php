@@ -9,7 +9,7 @@ use Phoenix\Database\Element\Index;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 
-class CreateItemTable extends AbstractMigration
+final class CreateItemTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
     protected function up(): void
