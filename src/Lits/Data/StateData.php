@@ -17,7 +17,7 @@ final class StateData extends DatabaseData
     public string $value;
 
     /**
-     * @param mixed[] $row
+     * @param array<string, string|null> $row
      * @throws InvalidDataException
      */
     public static function fromRow(
@@ -27,42 +27,37 @@ final class StateData extends DatabaseData
     ): self {
         $state = new static($settings, $database);
 
-        if (
-            !isset($row['catalog_id']) ||
-            !\is_string($row['catalog_id']) ||
-            $row['catalog_id'] === ''
-        ) {
+        $value = self::findRowString($row, 'catalog_id');
+
+        if (\is_null($value)) {
             throw new InvalidDataException('Catalog ID must be specified');
         }
 
-        if (
-            !isset($row['state']) ||
-            !\is_string($row['state']) ||
-            $row['state'] === ''
-        ) {
+        $state->catalog_id = $value;
+
+        $value = self::findRowString($row, 'state');
+
+        if (\is_null($value)) {
             throw new InvalidDataException('State must be specified');
         }
 
-        if (
-            !isset($row['field']) ||
-            !\is_string($row['field']) ||
-            $row['field'] === ''
-        ) {
+        $state->state = $value;
+
+        $value = self::findRowString($row, 'field');
+
+        if (\is_null($value)) {
             throw new InvalidDataException('Field must be specified');
         }
 
-        if (
-            !isset($row['value']) ||
-            !\is_string($row['value']) ||
-            $row['value'] === ''
-        ) {
+        $state->field = $value;
+
+        $value = self::findRowString($row, 'value');
+
+        if (\is_null($value)) {
             throw new InvalidDataException('Value must be specified');
         }
 
-        $state->catalog_id = $row['catalog_id'];
-        $state->state = $row['state'];
-        $state->field = $row['field'];
-        $state->value = $row['value'];
+        $state->value = $value;
 
         return $state;
     }
@@ -105,7 +100,7 @@ final class StateData extends DatabaseData
 
         $result = [];
 
-        /** @var mixed[] $row */
+        /** @var array<string, string|null> $row */
         foreach ($statement as $row) {
             $object = self::fromRow($row, $settings, $database);
 

@@ -25,10 +25,30 @@ final class IndexAction extends AuthAction
         $context = [
             'updated' => $statement->fetchColumn(),
             'total' => null,
-            'total_location' => [],
+            'total_location' => $this->total(),
             'total_catalog' => [],
         ];
 
+        foreach ($context['total_location'] as $catalog => $totals) {
+            $context['total_catalog'][$catalog] = \array_sum($totals);
+        }
+
+        $context['total'] = \array_sum($context['total_catalog']);
+
+        try {
+            $this->render($this->template(), $context);
+        } catch (\Throwable $exception) {
+            throw new HttpInternalServerErrorException(
+                $this->request,
+                null,
+                $exception
+            );
+        }
+    }
+
+    /** @return array<string, array<string, int>> */
+    private function total(): array
+    {
         $statement = $this->database->execute(
             $this->database->query
                 ->select(
@@ -47,38 +67,35 @@ final class IndexAction extends AuthAction
                 ->groupBy('catalog_id', 'location')
         );
 
-        /** @var string[] $row */
+        $total = [];
+
+        /** @var array<string, ?string> $row */
         foreach ($statement as $row) {
-            if (
-                !isset($row['catalog_id']) ||
-                !isset($row['location']) ||
-                !isset($row['total'])
-            ) {
-                continue;
+            $total = self::rowTotal($row, $total);
+        }
+
+        return $total;
+    }
+
+    /**
+     * @param array<string, ?string> $row
+     * @param array<string, array<string, int>> $total
+     * @return array<string, array<string, int>>
+     */
+    private static function rowTotal(array $row, array $total): array
+    {
+        if (
+            isset($row['catalog_id']) &&
+            isset($row['location']) &&
+            isset($row['total'])
+        ) {
+            if (!isset($total[$row['catalog_id']])) {
+                $total[$row['catalog_id']] = [];
             }
 
-            if (!isset($context['total_location'][$row['catalog_id']])) {
-                $context['total_location'][$row['catalog_id']] = [];
-            }
-
-            $context['total_location'][$row['catalog_id']][$row['location']] =
-                (int) $row['total'];
+            $total[$row['catalog_id']][$row['location']] = (int) $row['total'];
         }
 
-        foreach ($context['total_location'] as $catalog => $totals) {
-            $context['total_catalog'][$catalog] = \array_sum($totals);
-        }
-
-        $context['total'] = \array_sum($context['total_catalog']);
-
-        try {
-            $this->render($this->template(), $context);
-        } catch (\Throwable $exception) {
-            throw new HttpInternalServerErrorException(
-                $this->request,
-                null,
-                $exception
-            );
-        }
+        return $total;
     }
 }

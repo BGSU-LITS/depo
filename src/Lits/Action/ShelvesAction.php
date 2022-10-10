@@ -31,27 +31,19 @@ final class ShelvesAction extends AuthAction
         ];
 
         if (isset($this->data['module'])) {
-            $context['module'] = $this->data['module'];
-
-            if (!\in_array($context['module'], $context['modules'], true)) {
-                throw new HttpNotFoundException(
-                    $this->request,
-                    'Module ' . $context['module'] . 'could not be found'
-                );
-            }
+            $context['module'] = $this->module(
+                $this->data['module'],
+                $context['modules']
+            );
 
             $context['sides'] = $this->sides($context['module']);
 
             if (isset($this->data['side'])) {
-                $context['side'] = $this->data['side'];
-
-                if (!\in_array($context['side'], $context['sides'], true)) {
-                    throw new HttpNotFoundException(
-                        $this->request,
-                        'Side ' . $context['side'] .
-                        ' could not be found in Module ' . $context['module']
-                    );
-                }
+                $context['side'] = $this->side(
+                    $this->data['side'],
+                    $context['module'],
+                    $context['sides']
+                );
 
                 $context['sections'] = $this->sections(
                     $context['module'],
@@ -74,20 +66,7 @@ final class ShelvesAction extends AuthAction
                 );
             }
         } elseif (\count($context['modules']) === 1) {
-            try {
-                $this->redirect(
-                    $this->routeCollector->getRouteParser()->urlFor(
-                        'shelves',
-                        ['module' => (string) \reset($context['modules'])]
-                    )
-                );
-            } catch (\Throwable $exception) {
-                throw new HttpInternalServerErrorException(
-                    $this->request,
-                    null,
-                    $exception
-                );
-            }
+            $this->redirectModule((string) \reset($context['modules']));
 
             return;
         }
@@ -171,6 +150,22 @@ final class ShelvesAction extends AuthAction
         return self::column($statement);
     }
 
+    /**
+     * @param mixed[] $modules
+     * @throws HttpNotFoundException
+     */
+    private function module(string $module, array $modules): string
+    {
+        if (!\in_array($module, $modules, true)) {
+            throw new HttpNotFoundException(
+                $this->request,
+                'Module ' . $module . 'could not be found'
+            );
+        }
+
+        return $module;
+    }
+
     /** @return mixed[] */
     private function sides(string $module): array
     {
@@ -184,6 +179,22 @@ final class ShelvesAction extends AuthAction
         );
 
         return self::column($statement);
+    }
+
+    /**
+     * @param mixed[] $sides
+     * @throws HttpNotFoundException
+     */
+    private function side(string $side, string $module, array $sides): string
+    {
+        if (!\in_array($side, $sides, true)) {
+            throw new HttpNotFoundException(
+                $this->request,
+                'Side ' . $side . ' could not be found in Module ' . $module
+            );
+        }
+
+        return $side;
     }
 
     /** @return mixed[] */
@@ -268,6 +279,25 @@ final class ShelvesAction extends AuthAction
         }
 
         return $result;
+    }
+
+    /** @throws HttpInternalServerErrorException */
+    private function redirectModule(string $module): void
+    {
+        try {
+            $this->redirect(
+                $this->routeCollector->getRouteParser()->urlFor(
+                    'shelves',
+                    ['module' => $module]
+                )
+            );
+        } catch (\Throwable $exception) {
+            throw new HttpInternalServerErrorException(
+                $this->request,
+                null,
+                $exception
+            );
+        }
     }
 
     /** @return mixed[] */

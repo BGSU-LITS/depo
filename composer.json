@@ -12,9 +12,9 @@
         "php": "^7.4",
         "ext-PDO": "*",
         "ext-date": "*",
-        "bgsu-lits/framework": "^1.9.0",
-        "bgsu-lits/framework-auth": "^1.1.0",
-        "bgsu-lits/framework-database": "^1.1.0",
+        "bgsu-lits/framework": "^1.10.0",
+        "bgsu-lits/framework-auth": "^1.2.0",
+        "bgsu-lits/framework-database": "^1.2.1",
         "latitude/latitude": "^4.2",
         "league/csv": "^9.7",
         "lulco/phoenix": "^1.10",
@@ -29,22 +29,36 @@
         "phpunit/phpunit": "^9",
         "roave/security-advisories": "dev-master"
     },
+    "replace": {
+        "ext-sodium": "*",
+        "ext-zip": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lits\\": "src/Lits"
+        },
+        "exclude-from-classmap": [
+            "/src/Lits/Test/"
+        ]
+    },
     "config": {
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true,
+            "neronmoon/scriptsdev": true
+        },
         "sort-packages": true
     },
     "extra": {
+        "bamarni-bin": {
+            "bin-links": true,
+            "forward-command": true
+        },
         "scripts-dev": {
             "phpcbf": "phpcbf ./ --standard=phpcs.xml",
             "phpcs": "phpcs ./ --standard=phpcs.xml",
             "phplint": "phplint ./ --exclude=vendor",
             "phpstan": "phpstan analyse -c phpstan.neon",
             "phpunit": "phpunit -c phpunit.xml",
-            "post-install-cmd": [
-                "@composer bin all install --ansi"
-            ],
-            "post-update-cmd": [
-                "@composer bin all update --ansi"
-            ],
             "psalm": "psalm --config=psalm.xml",
             "test": [
                 "@phplint",
@@ -55,14 +69,6 @@
             ],
             "twigcs": "twigcs ./template"
         }
-    },
-    "autoload": {
-        "psr-4": {
-            "Lits\\": "src/Lits"
-        },
-        "exclude-from-classmap": [
-            "/src/Lits/Test/"
-        ]
     },
     "scripts": {
         "post-install-cmd": [

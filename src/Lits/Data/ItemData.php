@@ -45,48 +45,52 @@ final class ItemData extends DatabaseData
     ): self {
         $item = new static($settings, $database);
 
-        if (
-            !isset($row['location']) ||
-            !isset($row['record']) ||
-            !isset($row['created']) ||
-            !isset($row['updated'])
-        ) {
-            throw new InvalidDataException('Row does not contain valid data');
+        $data = self::findRowString($row, 'location');
+
+        if (\is_null($data)) {
+            throw new InvalidDataException('Location must be specified');
         }
 
-        $item->location = \trim($row['location']);
-        $item->record = \trim($row['record']);
-        $item->created = self::parseDate($row['created']);
-        $item->updated = self::parseDate($row['updated']);
+        $item->location = $data;
 
-        if (isset($row['revision'])) {
-            $item->revision = (int) $row['revision'];
+        $data = self::findRowString($row, 'record');
+
+        if (\is_null($data)) {
+            throw new InvalidDataException('Record must be specified');
         }
 
-        if (isset($row['status'])) {
-            $item->status = self::parseCode($row['status']);
+        $item->record = $data;
+
+        $data = self::findRowString($row, 'record');
+
+        if (\is_null($data)) {
+            throw new InvalidDataException('Record must be specified');
         }
 
-        if (isset($row['message'])) {
-            $item->message = self::parseCode($row['message']);
+        $item->record = $data;
+
+        $data = self::findRowDatetime($row, 'created');
+
+        if (\is_null($data)) {
+            throw new InvalidDataException('Created must be specified');
         }
 
-        if (isset($row['newest'])) {
-            $item->newest = (bool) $row['newest'];
+        $item->created = $data;
+
+        $data = self::findRowDatetime($row, 'updated');
+
+        if (\is_null($data)) {
+            throw new InvalidDataException('Updated must be specified');
         }
 
-        if (isset($row['state'])) {
-            $item->state = \trim($row['state']);
-        }
-
-        if (isset($row['barcodes'])) {
-            $item->barcodes = self::parseList($row['barcodes']);
-        }
-
-        if (isset($row['biblios'])) {
-            $item->biblios = self::parseList($row['biblios']);
-        }
-
+        $item->updated = $data;
+        $item->revision = self::findRowInt($row, 'revision');
+        $item->status = self::findRowCode($row, 'status');
+        $item->message = self::findRowCode($row, 'message');
+        $item->newest = (bool) self::findRowBool($row, 'newest');
+        $item->state = self::findRowString($row, 'state');
+        $item->barcodes = self::findRowList($row, 'barcodes');
+        $item->biblios = self::findRowList($row, 'biblios');
         $item->place = PlaceData::fromItem($item);
 
         return $item;
@@ -202,24 +206,15 @@ final class ItemData extends DatabaseData
         ');
     }
 
-    private static function parseCode(string $code): ?string
-    {
-        $code = \trim($code);
-
-        if ($code === '-') {
-            return null;
-        }
-
-        return $code;
-    }
-
     /**
-     * @param \DateTimeInterface|string $date
+     * @param array<string, string|null> $row
      * @throws InvalidDataException
      */
-    private static function parseDate($date): \DateTimeInterface
-    {
-        if (\is_string($date)) {
+    protected static function findRowDatetime(
+        array $row,
+        string $key
+    ): ?DateTimeImmutable {
+        if (isset($row[$key])) {
             try {
                 /** @var string */
                 $date = preg_replace(
@@ -231,38 +226,50 @@ final class ItemData extends DatabaseData
                         '19$3-$1-$2',
                         '$3-$1-$2',
                     ],
-                    $date
+                    $row[$key]
                 );
 
-                $date = new DateTimeImmutable($date);
+                return new DateTimeImmutable($date);
             } catch (\Throwable $exception) {
                 throw new InvalidDataException(
-                    'Could not parse date',
+                    'The string could not be parsed into a datetime',
                     0,
                     $exception
                 );
             }
         }
 
-        return $date;
+        return null;
+    }
+
+    /** @param array<string, string|null> $row */
+    private static function findRowCode(array $row, string $key): ?string
+    {
+        if (isset($row[$key])) {
+            $code = \trim($row[$key]);
+
+            if ($code !== '-') {
+                return $code;
+            }
+        }
+
+        return null;
     }
 
     /**
-     * @param string|string[]|null $list
+     * @param array<string, string|null> $row
      * @return string[]
      */
-    private static function parseList($list): array
+    private static function findRowList(array $row, string $key): array
     {
-        if (\is_null($list)) {
+        if (\is_null($row[$key])) {
             return [];
         }
 
-        if (\is_string($list)) {
-            $list = \explode(';', $list);
-        }
+        $list = \explode(';', $row[$key]);
 
-        foreach ($list as $key => $value) {
-            $list[$key] = \trim($value, '"');
+        foreach ($list as $list_key => $list_value) {
+            $list[$list_key] = \trim($list_value, '"');
         }
 
         return $list;

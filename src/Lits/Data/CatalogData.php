@@ -16,7 +16,7 @@ final class CatalogData extends DatabaseData
     public string $url;
 
     /**
-     * @param mixed[] $row
+     * @param array<string, string|null> $row
      * @throws InvalidDataException
      */
     public static function fromRow(
@@ -26,33 +26,29 @@ final class CatalogData extends DatabaseData
     ): self {
         $catalog = new static($settings, $database);
 
-        if (
-            !isset($row['id']) ||
-            !\is_string($row['id']) ||
-            $row['id'] === ''
-        ) {
+        $data = self::findRowString($row, 'id');
+
+        if (\is_null($data)) {
             throw new InvalidDataException('ID must be specified');
         }
 
-        if (
-            !isset($row['name']) ||
-            !\is_string($row['name']) ||
-            $row['name'] === ''
-        ) {
+        $catalog->id = \strtolower($data);
+
+        $data = self::findRowString($row, 'name');
+
+        if (\is_null($data)) {
             throw new InvalidDataException('Name must be specified');
         }
 
-        if (
-            !isset($row['url']) ||
-            !\is_string($row['url']) ||
-            $row['url'] === ''
-        ) {
-            throw new InvalidDataException('URL must be specified');
+        $catalog->name = $data;
+
+        $data = self::findRowString($row, 'url');
+
+        if (\is_null($data)) {
+            throw new InvalidDataException('URL must be specified ');
         }
 
-        $catalog->id = \strtolower($row['id']);
-        $catalog->name = $row['name'];
-        $catalog->url = $row['url'];
+        $catalog->url = $data;
 
         return $catalog;
     }
@@ -100,7 +96,7 @@ final class CatalogData extends DatabaseData
 
         $result = [];
 
-        /** @var mixed[] $row */
+        /** @var array<string, string|null> $row */
         foreach ($statement as $row) {
             $object = self::fromRow($row, $settings, $database);
 

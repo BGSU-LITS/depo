@@ -21,7 +21,7 @@ final class TrayData extends DatabaseData
     public ?string $color = null;
 
     /**
-     * @param mixed[] $row
+     * @param array<string, string|null> $row
      * @throws InvalidDataException
      */
     public static function fromRow(
@@ -31,63 +31,41 @@ final class TrayData extends DatabaseData
     ): self {
         $tray = new static($settings, $database);
 
-        if (
-            !isset($row['id']) ||
-            !\is_string($row['id']) ||
-            $row['id'] === ''
-        ) {
+        $data = self::findRowString($row, 'id');
+
+        if (\is_null($data)) {
             throw new InvalidDataException('ID must be specified');
         }
 
-        $tray->id = \strtoupper($row['id']);
+        $tray->id = \strtoupper($data);
 
-        if (isset($row['name'])) {
-            $tray->name = (string) $row['name'];
+        $data = self::findRowString($row, 'name');
+
+        if (!\is_null($data)) {
+            $tray->name = $data;
         }
 
-        if (
-            isset($row['length']) &&
-            !\is_null($row['length']) &&
-            $row['length'] > 0
-        ) {
-            $tray->length = (float) $row['length'];
-        }
+        $tray->length = self::positiveFloat(
+            self::findRowFloat($row, 'length')
+        );
 
-        if (
-            isset($row['width']) &&
-            !\is_null($row['width']) &&
-            $row['width'] > 0
-        ) {
-            $tray->width = (float) $row['width'];
-        }
+        $tray->width = self::positiveFloat(
+            self::findRowFloat($row, 'width')
+        );
 
-        if (
-            isset($row['height']) &&
-            !\is_null($row['height']) &&
-            $row['height'] > 0
-        ) {
-            $tray->height = (float) $row['height'];
-        }
+        $tray->height = self::positiveFloat(
+            self::findRowFloat($row, 'height')
+        );
 
-        if (
-            isset($row['per_shelf']) &&
-            !\is_null($row['per_shelf']) &&
-            $row['per_shelf'] > 0
-        ) {
-            $tray->per_shelf = (int) $row['per_shelf'];
-        }
+        $tray->per_shelf = self::positiveInt(
+            self::findRowInt($row, 'per_shelf')
+        );
 
-        if (
-            isset($row['total']) &&
-            !\is_null($row['total']) &&
-            $row['total'] > 0
-        ) {
-            $tray->total = (int) $row['total'];
-        }
+        $tray->total = self::positiveInt(
+            self::findRowInt($row, 'total')
+        );
 
-        if (isset($row['color']) && !\is_null($row['color'])) {
-            $tray->color = (string) $row['color'];
-        }
+        $tray->color = self::findRowString($row, 'color');
 
         return $tray;
     }
@@ -166,7 +144,7 @@ final class TrayData extends DatabaseData
 
         $result = [];
 
-        /** @var mixed[] $row */
+        /** @var array<string, string|null> $row */
         foreach ($statement as $row) {
             $object = self::fromRow($row, $settings, $database);
 
@@ -179,40 +157,43 @@ final class TrayData extends DatabaseData
     public static function fraction(float $number): string
     {
         $whole = \floor($number);
-        $decimal = $number - $whole;
 
-        if ($decimal === \floatval(0.0)) {
-            return (string) $whole;
-        }
+        switch ($number - $whole) {
+            case 0.0:
+                return (string) $whole;
 
-        if ($decimal === \floatval(0.125)) {
-            return (string) $whole . '⅛';
-        }
+            case 0.125:
+                return (string) $whole . '⅛';
 
-        if ($decimal === \floatval(0.25)) {
-            return (string) $whole . '¼';
-        }
+            case 0.25:
+                return (string) $whole . '¼';
 
-        if ($decimal === \floatval(0.375)) {
-            return (string) $whole . '⅜';
-        }
+            case 0.375:
+                return (string) $whole . '⅜';
 
-        if ($decimal === \floatval(0.5)) {
-            return (string) $whole . '½';
-        }
+            case 0.5:
+                return (string) $whole . '½';
 
-        if ($decimal === \floatval(0.625)) {
-            return (string) $whole . '⅝';
-        }
+            case 0.625:
+                return (string) $whole . '⅝';
 
-        if ($decimal === \floatval(0.75)) {
-            return (string) $whole . '¾';
-        }
+            case 0.75:
+                return (string) $whole . '¾';
 
-        if ($decimal === \floatval(0.875)) {
-            return (string) $whole . '⅞';
+            case 0.875:
+                return (string) $whole . '⅞';
         }
 
         return (string) $number;
+    }
+
+    public static function positiveFloat(?float $number): ?float
+    {
+        return \is_float($number) && $number > 0 ? $number : null;
+    }
+
+    public static function positiveInt(?int $number): ?int
+    {
+        return \is_int($number) && $number > 0 ? $number : null;
     }
 }

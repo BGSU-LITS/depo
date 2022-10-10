@@ -24,6 +24,26 @@ final class MonthAction extends AuthAction
      */
     public function action(): void
     {
+        $context = $this->context();
+
+        try {
+            $this->render($this->template(), $context);
+        } catch (\Throwable $exception) {
+            throw new HttpInternalServerErrorException(
+                $this->request,
+                null,
+                $exception
+            );
+        }
+    }
+
+    /**
+     * @throws HttpBadRequestException
+     * @throws HttpInternalServerErrorException
+     * @return array<string, mixed>
+     */
+    private function context(): array
+    {
         \assert($this->settings['depo'] instanceof DepoConfig);
 
         $date_first = $this->settings['depo']->start;
@@ -52,6 +72,7 @@ final class MonthAction extends AuthAction
 
             $date_previous = $date->modify('previous month');
             $date_next = $date->modify('next month');
+            $total = $this->total($date);
         } catch (Throwable $exception) {
             throw new HttpBadRequestException(
                 $this->request,
@@ -67,68 +88,73 @@ final class MonthAction extends AuthAction
             );
         }
 
-        $context = [
-            'catalogs' => CatalogData::all($this->settings, $this->database),
+        return [
+            'catalogs' => CatalogData::all(
+                $this->settings,
+                $this->database
+            ),
             'date' => $date,
             'date_first' => $date_first,
             'date_previous' => $date_previous,
             'date_next' => $date_next,
             'date_last' => $date_last,
-            'total' => [],
+            'total' => $total,
         ];
+    }
 
-        try {
-            $statement = $this->database->execute(
-                $this->database->query
-                    ->select(
-                        'catalog_id',
-                        'state',
-                        alias(func('COUNT', '*'), 'total')
-                    )
-                    ->from('item')
-                    ->where(field('updated')->between(
-                        $date->modify('first day of this month')
-                            ->format('Y-m-d'),
-                        $date->modify('last day of this month')
-                            ->format('Y-m-d')
-                    ))
-                    ->andWhere(field('state')->isNotNull())
-                    ->groupBy('catalog_id', 'state')
-            );
-        } catch (DatetimeException $exception) {
-            throw new HttpInternalServerErrorException(
-                $this->request,
-                'Could not determine date range',
-                $exception
-            );
-        }
+    /**
+     * @throws DatetimeException
+     * @return array<string, array<string, int>>
+     */
+    private function total(DateTimeImmutable $date): array
+    {
+        $total = [];
 
-        /** @var string[] $row */
+        $statement = $this->database->execute(
+            $this->database->query
+                ->select(
+                    'catalog_id',
+                    'state',
+                    alias(func('COUNT', '*'), 'total')
+                )
+                ->from('item')
+                ->where(field('updated')->between(
+                    $date->modify('first day of this month')
+                        ->format('Y-m-d'),
+                    $date->modify('last day of this month')
+                        ->format('Y-m-d')
+                ))
+                ->andWhere(field('state')->isNotNull())
+                ->groupBy('catalog_id', 'state')
+        );
+
+        /** @var array<string, ?string> $row */
         foreach ($statement as $row) {
-            if (
-                !isset($row['catalog_id']) ||
-                !isset($row['state']) ||
-                !isset($row['total'])
-            ) {
-                continue;
-            }
-
-            if (!isset($context['total'][$row['catalog_id']])) {
-                $context['total'][$row['catalog_id']] = [];
-            }
-
-            $context['total'][$row['catalog_id']][$row['state']] =
-                (int) $row['total'];
+            $total = self::rowTotal($row, $total);
         }
 
-        try {
-            $this->render($this->template(), $context);
-        } catch (\Throwable $exception) {
-            throw new HttpInternalServerErrorException(
-                $this->request,
-                null,
-                $exception
-            );
+        return $total;
+    }
+
+    /**
+     * @param array<string, ?string> $row
+     * @param array<string, array<string, int>> $total
+     * @return array<string, array<string, int>>
+     */
+    private static function rowTotal(array $row, array $total): array
+    {
+        if (
+            isset($row['catalog_id']) &&
+            isset($row['state']) &&
+            isset($row['total'])
+        ) {
+            if (!isset($total[$row['catalog_id']])) {
+                $total[$row['catalog_id']] = [];
+            }
+
+            $total[$row['catalog_id']][$row['state']] = (int) $row['total'];
         }
+
+        return $total;
     }
 }
