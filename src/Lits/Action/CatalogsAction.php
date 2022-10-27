@@ -44,6 +44,7 @@ final class CatalogsAction extends AuthAction
     ): Response {
         $this->setup($request, $response, $data);
 
+        /** @var array<string, string|null>|null */
         $post = $this->request->getParsedBody();
 
         if (!\is_array($post)) {

@@ -87,7 +87,7 @@ final class ItemData extends DatabaseData
         $item->revision = self::findRowInt($row, 'revision');
         $item->status = self::findRowCode($row, 'status');
         $item->message = self::findRowCode($row, 'message');
-        $item->newest = (bool) self::findRowBool($row, 'newest');
+        $item->newest = self::findRowBool($row, 'newest');
         $item->state = self::findRowString($row, 'state');
         $item->barcodes = self::findRowList($row, 'barcodes');
         $item->biblios = self::findRowList($row, 'biblios');
