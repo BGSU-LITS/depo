@@ -118,9 +118,7 @@ final class TrayData extends DatabaseData
      */
     public function save(): void
     {
-        $this->remove();
-
-        $this->database->insert('tray', [
+        $map = [
             'id' => $this->id,
             'name' => $this->name,
             'length' => $this->length,
@@ -129,7 +127,13 @@ final class TrayData extends DatabaseData
             'per_shelf' => $this->per_shelf,
             'total' => $this->total,
             'color' => $this->color,
-        ]);
+        ];
+
+        try {
+            $this->database->insert('tray', $map);
+        } catch (DuplicateInsertException $exception) {
+            $this->database->update('tray', $map, 'id', $map['id']);
+        }
     }
 
     /** @return array<string, self> */
