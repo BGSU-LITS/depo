@@ -4,25 +4,27 @@
 {% block styles %}
 {{ parent() }}
 <style>
-#content .table {
-    width: 100%
-}
-
-#content .table td.table_key_catalog_id {
+td.bgsu_common_table_key__catalog_id {
     text-transform: uppercase;
 }
 
+td.bgsu_common_table_key__created,
+td.bgsu_common_table_key__updated {
+    white-space: nowrap;
+}
 </style>
 {% endblock %}
 
-{% block content %}
-
-<h1>{{ title }}</h1>
+{% block breadcrumb %}
 <nav aria-label="breadcrumb">
-    <ol class="list-breadcrumb">
+    <ol class="bgsu_common_list_breadcrumb">
         <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li><a href="{{ url_for('shelves') }}">Shelves</a></li><li aria-current="page">{{ title }}</li>
     </ol>
 </nav>
+{% endblock %}
+
+{% block content %}
+{{ parent() }}
 
 {{ include('database/pagination.html.twig') }}
 {{ include('database/table.html.twig') }}

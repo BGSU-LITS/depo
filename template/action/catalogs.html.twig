@@ -1,20 +1,11 @@
 {% set title = 'Catalogs' %}
 {% extends 'page.html.twig' %}
 
-{% block styles %}
-{{ parent() }}
-<style>
-#content .table {
-    margin-bottom: 20px;
-}
-</style>
-{% endblock %}
-
 {% block scripts %}
 {{ parent() }}
 {% if auth.is('admin') %}
 <script>
-var cells = document.querySelectorAll('.table a[data-id');
+var cells = document.querySelectorAll('.bgsu_common_table a[data-id');
 
 Array.prototype.forEach.call(
     cells,
@@ -41,19 +32,18 @@ Array.prototype.forEach.call(
 {% endif %}
 {% endblock %}
 
-{% block content %}
-<h1>{{ title }}</h1>
+{% block breadcrumb %}
 <nav aria-label="breadcrumb">
-    <ol class="list-breadcrumb">
+    <ol class="bgsu_common_list_breadcrumb">
         <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li aria-current="page">Catalogs</li>
     </ol>
 </nav>
+{% endblock %}
 
-{% for message in messages %}
-<div class="alert alert-{{ message.level }}">{{ message.message }}</div>
-{% endfor %}
+{% block content %}
+{{ parent() }}
 
-<table class="table">
+<table class="bgsu_common_table">
     <thead>
         <tr>
             <th>ID</th>
@@ -75,24 +65,24 @@ Array.prototype.forEach.call(
 </table>
 
 {% if auth.is('admin') %}
-<form method="post" action="{{ url_for('catalogs') }}">
+<form method="post" action="{{ url_for('catalogs') }}" class="bgsu_common_form bgsu_common__screen">
     <h2>Manage Catalog</h2>
-    <div class="fields">
+    <div class="bgsu_common_form_table">
         <div>
-            <label for="id">ID:</label>
+            <label for="id">ID:</label><br>
             <div><input type="text" id="id" name="id" size="8" maxlength="8"></div>
         </div>
         <div>
-            <label for="name">Name:</label>
+            <label for="name">Name:</label><br>
             <div><input type="text" id="name" name="name" size="64" maxlength="255"></div>
         </div>
         <div>
-            <label for="name">URL:</label>
+            <label for="name">URL:</label><br>
             <div><input type="url" id="url" name="url" size="64" maxlength="255"></div>
         </div>
     </div>
-    <input type="submit" name="update" value="Update" class="button button-primary">
-    <input type="submit" name="remove" value="Remove" class="button">
+    <button type="submit" name="update" class="bgsu_common_button bgsu_common_button__arrow bgsu_common_button__primary">Update</button>
+    <button type="submit" name="remove" class="bgsu_common_button bgsu_common_button__failure">Remove</button>
 </form>
 {% endif %}
 

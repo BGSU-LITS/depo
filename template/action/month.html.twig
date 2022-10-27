@@ -1,41 +1,26 @@
 {% set title = date|date('F Y') %}
 {% extends 'page.html.twig' %}
 
-{% block styles %}
-{{ parent() }}
-<style>
-#content .narrow {
-    display: inline-block;
-}
-
-#content .table td:last-child {
-    text-align: right;
-}
-
-#content .table {
-    border-top: 2px solid #ccc;
-    border-bottom: 2px solid #ccc;
-}
-</style>
-{% endblock %}
-
-{% block content %}
-<h1>{{ title }}</h1>
+{% block breadcrumb %}
 <nav aria-label="breadcrumb">
-    <ol class="list-breadcrumb">
+    <ol class="bgsu_common_list_breadcrumb">
         <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li><a href="{{ url_for('month') }}">Monthly Changes</a></li><li aria-current="page">{{ title }}</li>
     </ol>
 </nav>
+{% endblock %}
 
-<div class="narrow">
-<table class="table">
+{% block content %}
+{{ parent() }}
+
+<div class="bgsu_common__narrow">
+<table class="bgsu_common_table bgsu_common__full">
 <tbody>
 {% for catalog in catalogs %}
 <tr>
     <th rowspan="3">{{ catalog.name }}</th>
 {% for state in ['accession', 'deaccession', 'update'] %}
     <td>{{ state|title }}s</td>
-    <td>{{ total[catalog.id][state]|number_format }}</td>
+    <td class="bgsu_common__figure">{{ total[catalog.id][state]|number_format }}</td>
 </tr>
 {% if not loop.last %}
 <tr>
@@ -45,14 +30,12 @@
 </tbody>
 </table>
 
-<nav class="nav-page" aria-label="pagination">
-    <div>
-        <a class="nav-page-first"{% if date_first < date %} href="?date={{ date_first|date('Y-m-d') }}"{% endif %}>First</a>
-        <a class="nav-page-previous"{% if date_previous < date and date_previous >= date_first %} href="?date={{ date_previous|date('Y-m-d') }}"{% endif %}>Previous</a>
-    </div>
-    <div>
-        <a class="nav-page-next"{% if date_next > date and date_next <= date_last %} href="?date={{ date_next|date('Y-m-d') }}"{% endif %}>Next</a>
-        <a class="nav-page-last"{% if date_last > date %} href="?date={{ date_last|date('Y-m-d') }}"{% endif %}>Last</a>
+<nav aria-label="pagination" class="bgsu_common_pagination bgsu_common__screen">
+    <div class="bgsu_common_pagination_buttons">
+        <a class="bgsu_common_button bgsu_common_button__small bgsu_common__arrow_first"{% if date_first < date %} href="?date={{ date_first|date('Y-m-d') }}"{% endif %}>First</a>
+        <a class="bgsu_common_button bgsu_common_button__small bgsu_common__arrow_previous"{% if date_previous < date and date_previous >= date_first %} href="?date={{ date_previous|date('Y-m-d') }}"{% endif %}>Previous</a>
+        <a class="bgsu_common_button bgsu_common_button__small bgsu_common__arrow_next"{% if date_next > date and date_next <= date_last %} href="?date={{ date_next|date('Y-m-d') }}"{% endif %}>Next</a>
+        <a class="bgsu_common_button bgsu_common_button__small bgsu_common__arrow_last"{% if date_last > date %} href="?date={{ date_last|date('Y-m-d') }}"{% endif %}>Last</a>
     </div>
 </nav>
 </div>

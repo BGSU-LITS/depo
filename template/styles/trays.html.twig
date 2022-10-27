@@ -1,0 +1,88 @@
+<style>
+@media print {
+    footer, header {
+        display: none !important;
+    }
+
+    #content h1 {
+        margin: 0;
+    }
+
+    #trays tbody td:last-child,
+    #trays tbody tr:last-child,
+    #trays thead th:last-child {
+        display: none;
+    }
+}
+
+#content .trays {
+    line-height: 1;
+    margin: 1rem 0;
+    vertical-align: middle;
+}
+
+#content .trays .tray {
+    padding: 0;
+}
+
+#content .trays .tray > * {
+    background: #fff;
+    color: inherit;
+    display: block;
+    font-weight: 300;
+    height: 2rem;
+    line-height: 2rem;
+    outline: 1px solid #dee2e6;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    width: 2rem;
+    z-index: 1;
+}
+
+#content .trays .tray > :any-link:active,
+#content .trays .tray > :any-link:focus,
+#content .trays .tray > :any-link:hover,
+#content .trays .tray > .active {
+    outline: 1px solid #949799;
+    z-index: 2;
+}
+
+#content .trays .tray > :any-link:active,
+#content .trays .tray > :any-link:focus,
+#content .trays .tray > :any-link:hover {
+    font-weight: 400;
+    z-index: 3;
+}
+
+#content .trays.bgsu_common_table .tray > * {
+    margin: 0 1px;
+}
+
+#content .trays.bgsu_common_table tr:first-child .tray > * {
+    margin-top: 1px;
+}
+
+#content .trays.bgsu_common__small .tray > * {
+    height: 1.5rem;
+    line-height: 1.5rem;
+    width: 1.5rem;
+}
+
+{% for tray in trays %}
+{% if tray.color %}
+#content .trays .tray > [data-id='{{ tray.id }}'],
+#content .trays .tray > [data-tray-id='{{ tray.id }}'] {
+    background: {{ tray.color }};
+}
+
+{% endif %}
+{% endfor %}
+#content .trays .tray > [data-id='?'],
+#content .trays .tray > [data-tray-id='?'] {
+    background: #666;
+    color: #fff;
+}
+</style>
