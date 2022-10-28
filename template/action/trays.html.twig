@@ -19,8 +19,7 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
             'length',
             'width',
             'height',
-            'pershelf',
-            'total'
+            'pershelf'
         ];
 
         fields.forEach((field) => {
@@ -55,13 +54,12 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
             <th>Width</th>
             <th>Height</th>
             <th>Per Shelf</th>
-            <th>Total</th>
         </tr>
     </thead>
     <tbody>
 {% for tray in trays %}
         <tr>
-            <td class="tray"><a{% if auth.is('admin') %} href="#"{% endif %} data-id="{{ tray.id }}" data-color="{{ tray.color }}" data-name="{{ tray.name }}" data-length="{{ tray.length }}" data-width="{{ tray.width }}" data-height="{{ tray.height }}" data-pershelf="{{ tray.per_shelf }}" data-total="{{ tray.total }}">{{ tray.id }}</a></td>
+            <td class="tray"><a{% if auth.is('admin') %} href="#"{% endif %} data-id="{{ tray.id }}" data-color="{{ tray.color }}" data-name="{{ tray.name }}" data-length="{{ tray.length }}" data-width="{{ tray.width }}" data-height="{{ tray.height }}" data-pershelf="{{ tray.per_shelf }}">{{ tray.id }}</a></td>
 {% if not tray.length and not tray.width and not tray.height %}
             <td colspan="4">{{ tray.name }}</td>
 {% else %}
@@ -71,7 +69,6 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
             <td class="bgsu_common__figure">{{ tray.height ? tray.fractionHeight : '' }}</td>
 {% endif %}
             <td class="bgsu_common__figure">{{ tray.per_shelf }}</td>
-            <td class="bgsu_common__figure">{{ tray.total ? tray.total|number_format : '' }}</td>
         </tr>
 {% endfor %}
     </tbody>
@@ -108,10 +105,6 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
         <div>
             <label for="pershelf">Per Shelf:</label>
             <div><input type="number" id="pershelf" name="per_shelf" min="1" max="99" step="1"></div>
-        </div>
-        <div>
-            <label for="total">Total:</label>
-            <div><input type="number" id="total" name="total" min="1" max="9999" step="1"></div>
         </div>
     </div>
     <button type="submit" name="update" class="bgsu_common_button bgsu_common_button__arrow bgsu_common_button__primary">Update</button>

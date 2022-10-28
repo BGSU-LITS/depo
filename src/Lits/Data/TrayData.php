@@ -17,7 +17,6 @@ final class TrayData extends DatabaseData
     public ?float $width = null;
     public ?float $height = null;
     public ?int $per_shelf = null;
-    public ?int $total = null;
     public ?string $color = null;
 
     /**
@@ -61,10 +60,6 @@ final class TrayData extends DatabaseData
             self::findRowInt($row, 'per_shelf')
         );
 
-        $tray->total = self::positiveInt(
-            self::findRowInt($row, 'total')
-        );
-
         $tray->color = self::findRowString($row, 'color');
 
         return $tray;
@@ -80,15 +75,9 @@ final class TrayData extends DatabaseData
             return $this->name;
         }
 
-        $result = $this->fractionLength() .
+        return $this->fractionLength() .
             ' × ' . $this->fractionWidth() .
             ' × ' . $this->fractionHeight();
-
-        if ($this->id === 'M') {
-            return $result . ' (' . $this->name . ')';
-        }
-
-        return $result;
     }
 
     public function fractionLength(): string
@@ -125,7 +114,6 @@ final class TrayData extends DatabaseData
             'width' => $this->width,
             'height' => $this->height,
             'per_shelf' => $this->per_shelf,
-            'total' => $this->total,
             'color' => $this->color,
         ];
 
