@@ -60,7 +60,7 @@ final class IndexAction extends AuthAction
                 ->where(
                     field('newest')->eq(true)->and(
                         group(field('state')->isNull()->or(
-                            field('state')->notEq('deaccessioned')
+                            field('state')->notEq('deaccession')
                         ))
                     )
                 )
