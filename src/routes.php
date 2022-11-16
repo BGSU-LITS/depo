@@ -7,10 +7,13 @@ use Lits\Action\IndexAction;
 use Lits\Action\MonthAction;
 use Lits\Action\Shelves\MissingShelvesAction;
 use Lits\Action\ShelvesAction;
+use Lits\Action\Space\TraySpaceAction;
+use Lits\Action\SpaceAction;
 use Lits\Action\TraysAction;
 use Lits\Command\ItemNewestCommand;
 use Lits\Command\ItemStateCommand;
 use Lits\Command\ProcessCommand;
+use Lits\Command\SpaceUpdateCommand;
 use Lits\Command\TrayIdsCommand;
 use Lits\Framework;
 
@@ -18,6 +21,7 @@ return function (Framework $framework): void {
     $framework->app()->get('/process', ProcessCommand::class);
     $framework->app()->get('/item_newest', ItemNewestCommand::class);
     $framework->app()->get('/item_state', ItemStateCommand::class);
+    $framework->app()->get('/space_update', SpaceUpdateCommand::class);
     $framework->app()->get('/tray_ids', TrayIdsCommand::class);
 
     $framework->app()
@@ -49,6 +53,14 @@ return function (Framework $framework): void {
     $framework->app()
         ->post('/shelves', [ShelvesAction::class, 'post'])
         ->setArgument('auth', 'admin');
+
+    $framework->app()
+        ->get('/space/{tray}[/{status}]', TraySpaceAction::class)
+        ->setName('space/tray');
+
+    $framework->app()
+        ->get('/space', SpaceAction::class)
+        ->setName('space');
 
     $framework->app()
         ->get('/trays', TraysAction::class)

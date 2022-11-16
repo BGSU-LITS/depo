@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lits\Action;
+
+use Lits\Data\SpaceData;
+use Lits\Data\TrayData;
+use Slim\Exception\HttpBadRequestException;
+use Slim\Exception\HttpInternalServerErrorException;
+use Slim\Exception\HttpNotFoundException;
+
+final class SpaceAction extends AuthAction
+{
+    use DateTrait;
+
+    /**
+     * @throws HttpBadRequestException
+     * @throws HttpInternalServerErrorException
+     * @throws HttpNotFoundException
+     */
+    public function action(): void
+    {
+        $context = $this->dateContext('space');
+
+        try {
+            $context['spaces'] = SpaceData::all(
+                $this->settings,
+                $this->database,
+                $this->date('space')
+            );
+
+            $context['trays'] = TrayData::all(
+                $this->settings,
+                $this->database
+            );
+
+            $this->render($this->template(), $context);
+        } catch (\Throwable $exception) {
+            throw new HttpInternalServerErrorException(
+                $this->request,
+                null,
+                $exception
+            );
+        }
+    }
+}

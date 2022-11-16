@@ -1,0 +1,110 @@
+{% set title = space.tray.name ~ ' ' ~ status|title %}
+{% extends 'page.html.twig' %}
+
+{% macro tray(tray) %}
+<div class="trays">
+<div class="tray bgsu_common__narrow">
+<span data-tray-id="{{ tray.id }}">{{ tray.id }}</span>
+</div>
+{% if tray.per_shelf %}
+{{ tray.fractionName }} {{ tray.level ~ 's' }}, up to {{ tray.per_shelf }} per shelf
+{% else %}
+Whole shelves
+{% endif %}
+</div>
+{% endmacro %}
+
+{% block styles %}
+{{ parent() }}
+{% include 'includes/styles/trays.html.twig' %}
+{% endblock %}
+
+{% block scripts %}
+{{ parent() }}
+{% include 'includes/scripts/shelves.html.twig' %}
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="bgsu_common__screen">
+    <ol class="bgsu_common_list_breadcrumb">
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li><a href="{{ url_for('space') }}">Space Usage</a></li><li><a href="{{ url_for('space') }}?date={{ space.updated|date('Y-m-d') }}">{{ space.updated|date('F Y') }}</a></li><li aria-current="page">{{ title }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="bgsu_common__screen">
+{{ parent() }}
+{{ _self.tray(space.tray) }}
+</div>
+
+<div class="bgsu_common_sidebar">
+<div>
+
+{% for module in modules|keys %}
+{% for side in modules[module]|keys %}
+<div class="bgsu_common__print_avoid">
+<h2 id="trays_{{ module }}_{{ side }}">
+    <span class="bgsu_common__print">{{ title }}:</span>
+    Module {{ module }} Side {{ side }}
+</h2>
+<div class="bgsu_common__print">
+{{ _self.tray(space.tray) }}
+</div>
+
+<table class="trays bgsu_common__center bgsu_common__small">
+    <thead>
+        <tr>
+            <th rowspan="2" colspan="2"></th>
+            <th colspan="{{ modules[module][side]|length }}">Sections</th>
+        </tr>
+        <tr>
+{% for section in modules[module][side]|keys %}
+            <th>{{ section }}</th>
+{% endfor %}
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+{% for shelf in modules[module][side]|first|keys %}
+        <tr>
+{% if loop.first %}
+            <th rowspan="{{ modules[module][side]|first|length }}"><span class="bgsu_common__rotate">Shelves</span></th>
+{% endif %}
+            <th>{{ shelf }}</th>
+{% for section in modules[module][side]|keys %}
+            <td class="tray"><a data-section="{{ section }}" data-shelf="{{ shelf }}" data-tray-id="{% if modules[module][side][section][shelf] != '' %}{{ space.tray.id }}{% endif %}" title="Section {{ section }} Shelf {{ shelf }}{% if modules[module][side][section][shelf] != '' %}: {{ modules[module][side][section][shelf] }} {{ status == 'free' ? ' Free' : ' Used' }}{% endif %}">{{ modules[module][side][section][shelf] != '' ? modules[module][side][section][shelf] : '&nbsp;' }}</a></td>
+{% endfor %}
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endfor %}
+{% endfor %}
+
+</div>
+<div class="bgsu_common_sidebar_left">
+<div class="bgsu_common__screen">
+<h2 class="bgsu_common_sidebar_title bgsu_common__title">Space Usage</h2>
+<ul>
+    <li{% if status == 'used' %} aria-current="true"{% endif %}><a href="{{ url_for('space/tray', { tray: space.tray.id, status: 'used' }) }}">{{ space.used|number_format }} {{ space.levelName(space.used) }} Used</a></li>
+    <li{% if status == 'free' %} aria-current="true"{% endif %}><a href="{{ url_for('space/tray', { tray: space.tray.id, status: 'free' }) }}">{{ space.free|number_format }} {{ space.levelName(space.free) }} Free</a></li>
+    <li{% if status != 'used' and status != 'free' %} aria-current="true"{% endif %}><a href="{{ url_for('space/tray', { tray: space.tray.id }) }}">{{ space.total|number_format }} {{ space.levelName(space.total) }} Total</a></li>
+</ul>
+
+<h2 class="bgsu_common_sidebar_title bgsu_common__title">Modules and Sides</h2>
+<ul>
+{% for module in modules|keys %}
+{% for side in modules[module]|keys %}
+    <li><a href="#trays_{{ module }}_{{ side }}">Module {{ module }} Side {{ side }}</a></li>
+{% endfor %}
+{% endfor %}
+</ul>
+
+</div>
+</div>
+</div>
+
+{% endblock %}

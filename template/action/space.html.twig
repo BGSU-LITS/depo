@@ -1,0 +1,56 @@
+{% set title = date|date('F Y') %}
+{% extends 'page.html.twig' %}
+
+{% block styles %}
+{{ parent() }}
+{% include 'includes/styles/trays.html.twig' %}
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="bgsu_common__screen">
+    <ol class="bgsu_common_list_breadcrumb">
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li><a href="{{ url_for('space') }}">Space Usage</a></li><li aria-current="page">{{ title }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% macro approx(number) %}
+{% if number is not null %}
+{% if number != 0 %}~{% endif %}{{ number|number_format }} ft³
+{% endif %}
+{% endmacro %}
+
+{% block content %}
+{{ parent() }}
+
+<table class="bgsu_common_table bgsu_common_table__separate trays">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th colspan="3" class="bgsu_common__center">Used</th>
+            <th colspan="3" class="bgsu_common__center">Free</th>
+            <th colspan="3" class="bgsu_common__center">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for space in spaces %}
+        <tr>
+            <td class="tray"><a data-id="{{ space.tray.id }}">{{ space.tray.id }}</a></td>
+            <td>{{ space.tray.name }}</td>
+            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %}  href="{{ url_for('space/tray', { tray: space.tray.id, status: 'used' }) }}"{% endif %}>{{ space.used|number_format }}</a></td>
+            <td>{{ space.levelName(space.used) }}</td>
+            <td class="bgsu_common__figure">{{ _self.approx(space.usedSpace) }}</td>
+            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %}  href="{{ url_for('space/tray', { tray: space.tray.id, status: 'free' }) }}"{% endif %}>{{ space.free|number_format }}</a></td>
+            <td>{{ space.levelName(space.free) }}</td>
+            <td class="bgsu_common__figure">{{ _self.approx(space.freeSpace) }}</td>
+            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %} href="{{ url_for('space/tray', { tray: space.tray.id }) }}"{% endif %}>{{ space.total|number_format }}</a></td>
+            <td>{{ space.levelName(space.total) }}</td>
+            <td class="bgsu_common__figure">{{ _self.approx(space.totalSpace) }}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% include 'includes/dates.html.twig' %}
+{% endblock %}
