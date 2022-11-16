@@ -10,7 +10,6 @@ use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Http\Response;
 use Slim\Http\ServerRequest;
-use stdClass;
 
 use function Latitude\QueryBuilder\alias;
 use function Latitude\QueryBuilder\field;
@@ -271,7 +270,7 @@ final class ShelvesAction extends AuthAction
         $rows = $statement->fetchAll(\PDO::FETCH_OBJ);
 
         if (\is_array($rows)) {
-            /** @var stdClass $row */
+            /** @var \stdClass $row */
             foreach ($rows as $row) {
                 $result[(string) $row->shelf][(string) $row->section] =
                     (int) $row->total;

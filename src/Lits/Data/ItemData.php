@@ -7,8 +7,8 @@ namespace Lits\Data;
 use Lits\Database;
 use Lits\Exception\InvalidDataException;
 use Lits\Settings;
-use PDOException;
 use Safe\DateTimeImmutable;
+use Safe\Exceptions\DatetimeException;
 
 use function Safe\preg_replace;
 
@@ -18,8 +18,8 @@ final class ItemData extends DatabaseData
     public ?string $catalog_id = null;
     public string $location;
     public string $record;
-    public \DateTimeInterface $created;
-    public \DateTimeInterface $updated;
+    public DateTimeImmutable $created;
+    public DateTimeImmutable $updated;
     public ?int $revision = null;
     public ?string $status = null;
     public ?string $message = null;
@@ -97,8 +97,9 @@ final class ItemData extends DatabaseData
     }
 
     /**
-     * @throws PDOException
+     * @throws \PDOException
      * @throws InvalidDataException
+     * @throws DatetimeException
      */
     public function save(): void
     {

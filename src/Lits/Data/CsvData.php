@@ -10,7 +10,7 @@ use Lits\Command;
 use Lits\Config\CsvConfig;
 use Lits\Exception\InvalidConfigException;
 use Lits\Exception\InvalidDataException;
-use PDOException;
+use Safe\Exceptions\DatetimeException;
 
 final class CsvData extends DatabaseData
 {
@@ -39,7 +39,7 @@ final class CsvData extends DatabaseData
 
             try {
                 $this->saveItem($catalog, $row);
-            } catch (InvalidDataException | PDOException $exception) {
+            } catch (InvalidDataException | \PDOException $exception) {
                 Command::output(\PHP_EOL . (string) $exception . \PHP_EOL);
 
                 continue;
@@ -88,8 +88,9 @@ final class CsvData extends DatabaseData
 
     /**
      * @param array<string, ?string> $row
+     * @throws DatetimeException
      * @throws InvalidDataException
-     * @throws PDOException
+     * @throws \PDOException
      */
     private function saveItem(string $catalog, array $row): void
     {
