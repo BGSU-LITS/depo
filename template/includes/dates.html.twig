@@ -1,0 +1,8 @@
+<nav aria-label="pagination" class="bgsu_common_pagination bgsu_common__screen">
+    <div class="bgsu_common_pagination_buttons">
+        <a class="bgsu_common_button bgsu_common_button__small bgsu_common__arrow_first"{% if date_first < date %} href="?date={{ date_first|date('Y-m-d') }}"{% endif %}>First</a>
+        <a class="bgsu_common_button bgsu_common_button__small bgsu_common__arrow_previous"{% if date_previous < date and date_previous >= date_first %} href="?date={{ date_previous|date('Y-m-d') }}"{% endif %}>Previous</a>
+        <a class="bgsu_common_button bgsu_common_button__small bgsu_common__arrow_next"{% if date_next > date and date_next <= date_last %} href="?date={{ date_next|date('Y-m-d') }}"{% endif %}>Next</a>
+        <a class="bgsu_common_button bgsu_common_button__small bgsu_common__arrow_last"{% if date_last > date %} href="?date={{ date_last|date('Y-m-d') }}"{% endif %}>Last</a>
+    </div>
+</nav>
