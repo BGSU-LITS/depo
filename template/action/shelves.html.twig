@@ -4,54 +4,15 @@
 {% block styles %}
 {{ parent() }}
 {% if shelves %}
-{% include 'styles/trays.html.twig' %}
+{% include 'includes/styles/trays.html.twig' %}
 {% endif %}
 {% endblock %}
 
 {% block scripts %}
 {{ parent() }}
-<script type="text/javascript" src="/template/2.0.0-b7/tippy.js"></script>
-<script>
-bgsu_tippy.setup("#trays .tray > a", {arrow: true, placement: "top"});
-
-const links = document.querySelectorAll('#trays .tray > a');
-const section = document.getElementById('section');
-const shelf = document.getElementById('shelf');
-const tray_id = document.getElementById('tray_id');
-
-links.forEach((link) => {
-{% if auth.is('admin') %}
-    link.addEventListener('click', (event) => {
-        event.preventDefault();
-
-        section.value = event.target.dataset.section;
-        shelf.value = event.target.dataset.shelf;
-        tray_id.value = event.target.dataset.trayId;
-
-        tray_id.focus();
-    });
+{% if shelves %}
+{% include 'includes/scripts/shelves.html.twig' %}
 {% endif %}
-
-    link.addEventListener('mouseover', (event) => {
-        links.forEach((link) => {
-            link.classList.remove('active');
-
-            if (
-                link.dataset.section == event.target.dataset.section ||
-                link.dataset.shelf == event.target.dataset.shelf
-            ) {
-                link.classList.add('active');
-            }
-        });
-    });
-});
-
-document.getElementById('trays').addEventListener('mouseout', (event) => {
-    links.forEach((link) => {
-        link.classList.remove('active');
-    });
-});
-</script>
 {% endblock %}
 
 {% block breadcrumb %}
@@ -193,8 +154,8 @@ document.getElementById('trays').addEventListener('mouseout', (event) => {
 <table class="bgsu_common_table bgsu_common_table__small bgsu_common__small trays">
 {% for tray in trays %}
     <tr>
-        <th class="tray"><a data-id="{{ tray.id }}">{{ tray.id }}</a></th>
-        <td>{{ tray.fractionName }}</td>
+        <th class="tray"><span data-id="{{ tray.id }}">{{ tray.id }}</span></th>
+        <td>{{ tray.name == tray.id ~ '-Size' ? tray.fractionName : tray.name }}</td>
     </tr>
 {% endfor %}
     <tr>

@@ -1,0 +1,47 @@
+<script type="text/javascript" src="/template/2.0.0-b8/tippy.js"></script>
+<script>
+bgsu_tippy.setup(".trays .tray > [title]", {arrow: true, placement: "top"});
+
+document.querySelectorAll('.trays').forEach((tray) => {
+    const links = tray.querySelectorAll('.tray > a');
+    const tray_id = document.getElementById('tray_id');
+
+    links.forEach((link) => {
+{% if auth.is('admin') %}
+        if (tray_id) {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+
+                document.getElementById('section').value =
+                    event.target.dataset.section;
+
+                document.getElementById('shelf').value =
+                    event.target.dataset.shelf;
+
+                tray_id.value = event.target.dataset.trayId;
+                tray_id.focus();
+            });
+        }
+{% endif %}
+
+        link.addEventListener('mouseover', (event) => {
+            links.forEach((link) => {
+                link.classList.remove('active');
+
+                if (
+                    link.dataset.section == event.target.dataset.section ||
+                    link.dataset.shelf == event.target.dataset.shelf
+                ) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    });
+
+    tray.addEventListener('mouseout', (event) => {
+        links.forEach((link) => {
+            link.classList.remove('active');
+        });
+    });
+});
+</script>
