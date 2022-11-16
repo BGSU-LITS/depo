@@ -35,7 +35,7 @@ Array.prototype.forEach.call(
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
     <ol class="bgsu_common_list_breadcrumb">
-        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li aria-current="page">Catalogs</li>
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li aria-current="page">{{ title }}</li>
     </ol>
 </nav>
 {% endblock %}
