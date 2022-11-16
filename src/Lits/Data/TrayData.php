@@ -17,6 +17,7 @@ final class TrayData extends DatabaseData
     public ?float $width = null;
     public ?float $height = null;
     public ?int $per_shelf = null;
+    public ?string $level = null;
     public ?string $color = null;
 
     /**
@@ -60,6 +61,7 @@ final class TrayData extends DatabaseData
             self::findRowInt($row, 'per_shelf')
         );
 
+        $tray->level = self::findRowString($row, 'level');
         $tray->color = self::findRowString($row, 'color');
 
         return $tray;
@@ -104,9 +106,16 @@ final class TrayData extends DatabaseData
     /**
      * @throws \PDOException
      * @throws DuplicateInsertException
+     * @throws InvalidDataException
      */
     public function save(): void
     {
+        if (\is_null($this->per_shelf) !== \is_null($this->level)) {
+            throw new InvalidDataException(
+                'Per Shelf and Level must be specified together'
+            );
+        }
+
         $map = [
             'id' => $this->id,
             'name' => $this->name,
@@ -114,6 +123,7 @@ final class TrayData extends DatabaseData
             'width' => $this->width,
             'height' => $this->height,
             'per_shelf' => $this->per_shelf,
+            'level' => $this->level,
             'color' => $this->color,
         ];
 

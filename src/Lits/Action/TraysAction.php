@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lits\Action;
 
 use Lits\Data\TrayData;
+use Lits\Exception\InvalidDataException;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Http\Response;
@@ -52,6 +53,10 @@ final class TraysAction extends AuthAction
         }
 
         try {
+            $this->redirect(
+                $this->routeCollector->getRouteParser()->urlFor('trays')
+            );
+
             $tray = TrayData::fromRow(
                 $post,
                 $this->settings,
@@ -73,9 +78,10 @@ final class TraysAction extends AuthAction
                     'Updated Tray Type ' . $tray->id
                 );
             }
-
-            $this->redirect(
-                $this->routeCollector->getRouteParser()->urlFor('trays')
+        } catch (InvalidDataException $exception) {
+            $this->message(
+                'failure',
+                \rtrim($exception->getMessage(), '.') . '.'
             );
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(

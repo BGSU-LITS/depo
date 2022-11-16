@@ -3,7 +3,7 @@
 
 {% block styles %}
 {{ parent() }}
-{% include 'styles/trays.html.twig' %}
+{% include 'includes/styles/trays.html.twig' %}
 {% endblock %}
 
 {% block scripts %}
@@ -19,17 +19,27 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
             'length',
             'width',
             'height',
-            'pershelf'
+            'pershelf',
+            'level'
         ];
 
         fields.forEach((field) => {
             document.getElementById(field).value = event.target.dataset[field];
+            document.getElementById(field).dispatchEvent(new Event('change'));
         });
 
         document.getElementById('name').focus();
         event.preventDefault();
     });
 });
+
+const paired = Array.from(document.querySelectorAll('#pershelf, #level'));
+
+paired.forEach((field) => field.addEventListener('change', (event) => {
+    paired.filter((field) => field !== event.target).forEach((field) => {
+        field.required = event.target.value.length !== 0
+    });
+}));
 </script>
 {% endif %}
 {% endblock %}
@@ -37,7 +47,7 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
 {% block breadcrumb %}
 <nav aria-label="breadcrumb" class="bgsu_common__screen">
     <ol class="bgsu_common_list_breadcrumb">
-        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li aria-current="page">Trays</li>
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li aria-current="page">{{ title }}</li>
     </ol>
 </nav>
 {% endblock %}
@@ -59,7 +69,7 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
     <tbody>
 {% for tray in trays %}
         <tr>
-            <td class="tray"><a{% if auth.is('admin') %} href="#"{% endif %} data-id="{{ tray.id }}" data-color="{{ tray.color }}" data-name="{{ tray.name }}" data-length="{{ tray.length }}" data-width="{{ tray.width }}" data-height="{{ tray.height }}" data-pershelf="{{ tray.per_shelf }}">{{ tray.id }}</a></td>
+            <td class="tray"><a{% if auth.is('admin') %} href="#"{% endif %} data-id="{{ tray.id }}" data-color="{{ tray.color }}" data-name="{{ tray.name }}" data-length="{{ tray.length }}" data-width="{{ tray.width }}" data-height="{{ tray.height }}" data-pershelf="{{ tray.per_shelf }}" data-level="{{ tray.level }}">{{ tray.id }}</a></td>
 {% if not tray.length and not tray.width and not tray.height %}
             <td colspan="4">{{ tray.name }}</td>
 {% else %}
@@ -68,7 +78,7 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
             <td class="bgsu_common__figure">{{ tray.width ? tray.fractionWidth : '' }}</td>
             <td class="bgsu_common__figure">{{ tray.height ? tray.fractionHeight : '' }}</td>
 {% endif %}
-            <td class="bgsu_common__figure">{{ tray.per_shelf }}</td>
+            <td class="bgsu_common__figure">{{ tray.per_shelf }} {{ tray.level ? tray.level|capitalize ~ 's' : '' }}</td>
         </tr>
 {% endfor %}
     </tbody>
@@ -105,6 +115,16 @@ document.querySelectorAll('#content .trays .tray > a').forEach((link) => {
         <div>
             <label for="pershelf">Per Shelf:</label>
             <div><input type="number" id="pershelf" name="per_shelf" min="1" max="99" step="1"></div>
+        </div>
+        <div>
+            <label for="level">Level:</label>
+            <div>
+                <select id="level" name="level">
+                    <option value=""></option>
+                    <option value="tray">Tray</option>
+                    <option value="item">Item</option>
+                </select>
+            </div>
         </div>
     </div>
     <button type="submit" name="update" class="bgsu_common_button bgsu_common_button__arrow bgsu_common_button__primary">Update</button>
