@@ -1,0 +1,47 @@
+{% set title = place ? ((place.module != '0' ? ' Module ' ~ place.module) ~ (place.side != '00' ? ', Side ' ~ place.side) ~ (place.section != '00' ? ', Section ' ~ place.section) ~ (place.shelf != '00' ? ', Shelf ' ~ place.shelf) ~ (place.tray != '00' ? ', Tray ' ~ place.tray) ~ (place.item != '00' ? ', Item ' ~ place.item)) : 'Items' %}
+{% extends 'page.html.twig' %}
+
+{% block styles %}
+{{ parent() }}
+<style>
+td.bgsu_common_table_key__catalog_id {
+    text-transform: uppercase;
+}
+
+td.bgsu_common_table_key__created,
+td.bgsu_common_table_key__updated {
+    white-space: nowrap;
+}
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="bgsu_common_list_breadcrumb">
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li>{% if place %}<li><a href="{{ url_for('items') }}">Items</a></li>{% endif %}<li aria-current="page">{{ title }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+{{ parent() }}
+
+<form method="get">
+<p>
+<label for="barcode">Barcode:</label>
+<input id="barcode" name="barcode" value="{{ barcode }}">
+<button type="submit" class="bgsu_common_button bgsu_common_button__primary bgsu_common_button__small">View Items</button>
+</p>
+</form>
+
+{% if pagination.getNbResults() %}
+{{ include('database/pagination.html.twig') }}
+{{ include('database/table.html.twig') }}
+{{ include('database/pagination.html.twig') }}
+{% elseif barcode %}
+<div class="bgsu_common_alert bgsu_common_alert__warning">
+No results found for the specified barcode.
+</div>
+{% endif %}
+
+{% endblock %}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Lits\Action\CatalogsAction;
 use Lits\Action\IndexAction;
+use Lits\Action\ItemsAction;
 use Lits\Action\MonthAction;
 use Lits\Action\Shelves\MissingShelvesAction;
 use Lits\Action\ShelvesAction;
@@ -39,6 +40,12 @@ return function (Framework $framework): void {
     $framework->app()
         ->get('/month', MonthAction::class)
         ->setName('month');
+
+    $framework->app()
+        ->get('/items[/{barcode}]', ItemsAction::class)
+        ->setName('items');
+
+    ItemsAction::addFileRoutes($framework->app(), '/items/{barcode}');
 
     $framework->app()
         ->get('/shelves/missing', MissingShelvesAction::class)
