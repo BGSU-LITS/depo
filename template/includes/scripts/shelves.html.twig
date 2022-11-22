@@ -1,9 +1,9 @@
 <script type="text/javascript" src="/template/2.0.0-b8/tippy.js"></script>
 <script>
-bgsu_tippy.setup(".trays .tray > [title]", {arrow: true, placement: "top"});
+bgsu_tippy.setup(".trays [title]", {arrow: true, placement: "top"});
 
 document.querySelectorAll('.trays').forEach((tray) => {
-    const links = tray.querySelectorAll('.tray > a');
+    const links = tray.querySelectorAll('a');
     const tray_id = document.getElementById('tray_id');
 
     links.forEach((link) => {
