@@ -18,7 +18,7 @@
 {% block breadcrumb %}
 <nav aria-label="breadcrumb" class="bgsu_common__screen">
     <ol class="bgsu_common_list_breadcrumb">
-        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li>{% if module %}<li><a href="{{ url_for('shelves') }}">Shelves</a></li>{% if side %}<li><a href="{{ url_for('shelves', {'module': module}) }}">Module {{ module }}</a></li><li aria-current="page">Side {{ side }}</li>{% else %}<li aria-current="page">Module {{ module }}</li>{% endif %}{% else %}<li aria-current="page">Shelves</li>{% endif %}
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li>{% if module %}<li><a href="{{ url_for('shelves') }}">Shelves</a></li>{% if side %}<li><a href="{{ url_for('shelves', {'module': module}) }}">Module {{ module }}</a></li><li aria-current="page">Side {{ side }}</li>{% else %}<li aria-current="page">Module {{ module }}</li>{% endif %}{% else %}<li aria-current="page">{{ title }}</li>{% endif %}
     </ol>
 </nav>
 {% endblock %}

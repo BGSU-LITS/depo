@@ -36,15 +36,15 @@
     <tbody>
 {% for space in spaces %}
         <tr>
-            <td class="tray"><a data-id="{{ space.tray.id }}">{{ space.tray.id }}</a></td>
+            <td class="tray"><span data-id="{{ space.tray.id }}">{{ space.tray.id }}</span></td>
             <td>{{ space.tray.name }}</td>
-            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %}  href="{{ url_for('space/tray', { tray: space.tray.id, status: 'used' }) }}"{% endif %}>{{ space.used|number_format }}</a></td>
+            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %} href="{{ url_for('space/tray', {tray: space.tray.id, status: 'used'}) }}"{% endif %}>{{ space.used|number_format }}</a></td>
             <td>{{ space.levelName(space.used) }}</td>
             <td class="bgsu_common__figure">{{ _self.approx(space.usedSpace) }}</td>
-            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %}  href="{{ url_for('space/tray', { tray: space.tray.id, status: 'free' }) }}"{% endif %}>{{ space.free|number_format }}</a></td>
+            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %} href="{{ url_for('space/tray', {tray: space.tray.id, status: 'free'}) }}"{% endif %}>{{ space.free|number_format }}</a></td>
             <td>{{ space.levelName(space.free) }}</td>
             <td class="bgsu_common__figure">{{ _self.approx(space.freeSpace) }}</td>
-            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %} href="{{ url_for('space/tray', { tray: space.tray.id }) }}"{% endif %}>{{ space.total|number_format }}</a></td>
+            <td class="bgsu_common__figure bgsu_common__join"><a{% if date == date_last %} href="{{ url_for('space/tray', {tray: space.tray.id}) }}"{% endif %}>{{ space.total|number_format }}</a></td>
             <td>{{ space.levelName(space.total) }}</td>
             <td class="bgsu_common__figure">{{ _self.approx(space.totalSpace) }}</td>
         </tr>
