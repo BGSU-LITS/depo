@@ -44,6 +44,7 @@ trait ItemsTrait
     {
         $context = [
             'pagination' => $this->database->paginate($this->select()),
+            'pagination_rows' => 'Items',
             'pagination_sort' => 'sorted by Barcode',
             'pagination_file' => 'xlsx',
             'table_headers' => $this->table_headers,
