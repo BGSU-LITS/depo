@@ -1,4 +1,4 @@
-{% set title = place ? ((place.module != '0' ? ' Module ' ~ place.module) ~ (place.side != '00' ? ', Side ' ~ place.side) ~ (place.section != '00' ? ', Section ' ~ place.section) ~ (place.shelf != '00' ? ', Shelf ' ~ place.shelf) ~ (place.tray != '00' ? ', Tray ' ~ place.tray) ~ (place.item != '00' ? ', Item ' ~ place.item)) : 'Items' %}
+{% set title = place ? ((place.module != '0' ? ' Module ' ~ place.module) ~ (place.side != '00' ? ' Side ' ~ place.side) ~ (place.section != '00' ? ' Section ' ~ place.section) ~ (place.shelf != '00' ? ' Shelf ' ~ place.shelf) ~ (place.tray != '00' ? ' Tray ' ~ place.tray) ~ (place.item != '00' ? ' Item ' ~ place.item)) : 'Items' %}
 {% extends 'page.html.twig' %}
 
 {% block styles %}
@@ -34,14 +34,10 @@ td.bgsu_common_table_key__updated {
 </p>
 </form>
 
-{% if pagination.getNbResults() %}
+{% if barcode %}
 {{ include('database/pagination.html.twig') }}
 {{ include('database/table.html.twig') }}
 {{ include('database/pagination.html.twig') }}
-{% elseif barcode %}
-<div class="bgsu_common_alert bgsu_common_alert__warning">
-No results found for the specified barcode.
-</div>
 {% endif %}
 
 {% endblock %}
