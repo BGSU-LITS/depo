@@ -15,7 +15,6 @@ use Lits\Command\ItemNewestCommand;
 use Lits\Command\ItemStateCommand;
 use Lits\Command\ProcessCommand;
 use Lits\Command\SpaceUpdateCommand;
-use Lits\Command\TrayIdsCommand;
 use Lits\Framework;
 
 return function (Framework $framework): void {
@@ -23,7 +22,6 @@ return function (Framework $framework): void {
     $framework->app()->get('/item_newest', ItemNewestCommand::class);
     $framework->app()->get('/item_state', ItemStateCommand::class);
     $framework->app()->get('/space_update', SpaceUpdateCommand::class);
-    $framework->app()->get('/tray_ids', TrayIdsCommand::class);
 
     $framework->app()
         ->get('/', IndexAction::class)

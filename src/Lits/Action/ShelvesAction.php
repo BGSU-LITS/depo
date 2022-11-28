@@ -253,13 +253,20 @@ final class ShelvesAction extends AuthAction
                 )
                 ->from('item')
                 ->join('place', on('item.id', 'place.item_id'))
+                ->leftJoin(
+                    'shelf',
+                    on('place.module', 'shelf.module')
+                        ->and(on('place.side', 'shelf.side'))
+                        ->and(on('place.section', 'shelf.section'))
+                        ->and(on('place.shelf', 'shelf.shelf'))
+                )
                 ->where(field('item.newest')->eq(true))
                 ->andWhere(group(field('item.state')->isNull()->or(
                     field('item.state')->notEq('deaccession')
                 )))
                 ->andWhere(field('place.module')->eq($module))
                 ->andWhere(field('place.side')->eq($side))
-                ->andWhere(field('place.tray_id')->isNull())
+                ->andWhere(field('shelf.tray_id')->isNull())
                 ->groupBy('place.section', 'place.shelf')
                 ->orderBy('place.section', 'ASC')
                 ->orderBy('place.shelf', 'ASC')

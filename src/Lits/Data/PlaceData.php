@@ -31,7 +31,6 @@ final class PlaceData extends DatabaseData
     public const PATTERN_BARCODE_MYSQL = '^8[0-9]{9}([0-9]{2}.?)?$';
 
     public ?int $item_id = null;
-    public ?int $tray_id = null;
     public string $module;
     public string $side;
     public string $section;
@@ -109,7 +108,6 @@ final class PlaceData extends DatabaseData
                 'item_id' => $this->item_id,
             ],
             [
-                'tray_id' => $this->tray_id,
                 'module' => $this->module,
                 'side' => $this->side,
                 'section' => $this->section,
@@ -119,22 +117,5 @@ final class PlaceData extends DatabaseData
             ],
             'item_id'
         );
-    }
-
-    public static function setTrayIds(Database $database): int
-    {
-        return (int) $database->pdo->exec('
-            update
-                place,
-                shelf
-            set
-                place.tray_id = shelf.tray_id
-            where
-                place.tray_id is null
-                and place.module = shelf.module
-                and place.side = shelf.side
-                and place.section = shelf.section
-                and place.shelf = shelf.shelf;
-        ');
     }
 }
