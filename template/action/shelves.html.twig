@@ -139,7 +139,7 @@
 {% endif %}
 
 {% if sides %}
-<h2 class="bgsu_common_sidebar_title bgsu_common__title">Sides</h2>
+<h2{% if shelves %} class="bgsu_common_sidebar_title bgsu_common__title"{% endif %}>Sides</h2>
 <ul>
 {% for value in sides %}
     <li{% if side == value %} aria-current="true"{% endif %}><a href="{{ url_for('shelves', {'module': module, 'side': value}) }}">Side {{ value }}</a></li>
