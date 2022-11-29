@@ -16,7 +16,7 @@
 
 {% macro approx(number) %}
 {% if number is not null %}
-{% if number != 0 %}~{% endif %}{{ number|number_format }} ft³
+{{ number|number_format }} ft³
 {% endif %}
 {% endmacro %}
 
@@ -53,4 +53,6 @@
 </table>
 
 {% include 'includes/dates.html.twig' %}
+
+<p>Measurements shown in cubic feet are approximate.</p>
 {% endblock %}
