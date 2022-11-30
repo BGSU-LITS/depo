@@ -30,6 +30,24 @@ final class SpaceAction extends AuthAction
                 $this->date('space')
             );
 
+            $context['total'] = [
+                'usedSpace' => \array_reduce(
+                    $context['spaces'],
+                    fn (?float $total, SpaceData $space): float =>
+                        (float) $total + (float) $space->usedSpace()
+                ),
+                'freeSpace' => \array_reduce(
+                    $context['spaces'],
+                    fn (?float $total, SpaceData $space): float =>
+                        (float) $total + (float) $space->freeSpace()
+                ),
+                'totalSpace' => \array_reduce(
+                    $context['spaces'],
+                    fn (?float $total, SpaceData $space): float =>
+                        (float) $total + (float) $space->totalSpace()
+                ),
+            ];
+
             $context['trays'] = TrayData::all(
                 $this->settings,
                 $this->database

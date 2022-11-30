@@ -50,6 +50,15 @@
         </tr>
 {% endfor %}
     </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <th>Combined</th>
+            <td colspan="3" class="bgsu_common__figure"><strong>{{ _self.approx(total.usedSpace) }}</strong></td>
+            <td colspan="3" class="bgsu_common__figure"><strong>{{ _self.approx(total.freeSpace) }}</strong></td>
+            <td colspan="3" class="bgsu_common__figure"><strong>{{ _self.approx(total.totalSpace) }}</strong></td>
+        </tr>
+    </tfoot>
 </table>
 
 {% include 'includes/dates.html.twig' %}
