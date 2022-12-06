@@ -29,24 +29,36 @@ final class SpaceUpdateCommand extends DatabaseCommand
                 count(
                     distinct if(
                         tray.level is null,
-                        place.shelf,
+                        find.shelf,
                         if(
                             tray.level = "tray",
-                            place.tray,
-                            place.item
+                            find.tray,
+                            find.item
                         )
                     )
                 ) as used
             from
                 shelf
-            left join
-                place
-                    using (module, side, section, shelf)
-            left join
-                item
-                    on place.item_id = item.id
-                        and item.newest = 1
-                        and (item.state is null or item.state != "deaccession")
+            left join (
+                select
+                    place.module,
+                    place.side,
+                    place.section,
+                    place.shelf,
+                    place.tray,
+                    place.item
+                from
+                    place
+                join
+                    item
+                        on place.item_id = item.id
+                            and item.newest = 1
+                            and (
+                                item.state is null
+                                    or item.state != "deaccession"
+                            )
+            ) as find
+                using (module, side, section, shelf)
             left join
                 tray
                     on shelf.tray_id = tray.id
