@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lits\Action\Shelves;
 
 use Latitude\QueryBuilder\Query\SelectQuery;
-use Lits\Action\AuthAction;
+use Lits\Action\AuthDatabaseAction;
 use Lits\Action\DatabaseFileTrait;
 use Lits\Action\ItemsTrait;
 use Slim\Exception\HttpInternalServerErrorException;
@@ -13,7 +13,7 @@ use Slim\Exception\HttpInternalServerErrorException;
 use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\on;
 
-final class MissingShelvesAction extends AuthAction
+final class MissingShelvesAction extends AuthDatabaseAction
 {
     use DatabaseFileTrait;
     use ItemsTrait;

@@ -11,7 +11,7 @@ use Slim\Exception\HttpInternalServerErrorException;
 
 use function Latitude\QueryBuilder\field;
 
-final class ItemsAction extends AuthAction
+final class ItemsAction extends AuthDatabaseAction
 {
     use DatabaseFileTrait;
     use ItemsTrait;

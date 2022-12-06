@@ -11,7 +11,7 @@ use Slim\Exception\HttpNotFoundException;
 use Slim\Http\Response;
 use Slim\Http\ServerRequest;
 
-final class TraysAction extends AuthAction
+final class TraysAction extends AuthDatabaseAction
 {
     /**
      * @throws HttpInternalServerErrorException

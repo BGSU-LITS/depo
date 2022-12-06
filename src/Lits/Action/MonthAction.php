@@ -14,7 +14,7 @@ use function Latitude\QueryBuilder\alias;
 use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
 
-final class MonthAction extends AuthAction
+final class MonthAction extends AuthDatabaseAction
 {
     use DateTrait;
 

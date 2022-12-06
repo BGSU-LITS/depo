@@ -10,7 +10,7 @@ use Slim\Exception\HttpNotFoundException;
 use Slim\Http\Response;
 use Slim\Http\ServerRequest;
 
-final class CatalogsAction extends AuthAction
+final class CatalogsAction extends AuthDatabaseAction
 {
     /**
      * @throws HttpInternalServerErrorException

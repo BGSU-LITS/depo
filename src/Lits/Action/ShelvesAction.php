@@ -17,7 +17,7 @@ use function Latitude\QueryBuilder\func;
 use function Latitude\QueryBuilder\group;
 use function Latitude\QueryBuilder\on;
 
-final class ShelvesAction extends AuthAction
+final class ShelvesAction extends AuthDatabaseAction
 {
     /**
      * @throws HttpInternalServerErrorException

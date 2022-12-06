@@ -10,7 +10,7 @@ use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
 
-final class SpaceAction extends AuthAction
+final class SpaceAction extends AuthDatabaseAction
 {
     use DateTrait;
 

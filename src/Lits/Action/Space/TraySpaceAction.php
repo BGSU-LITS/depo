@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lits\Action\Space;
 
-use Lits\Action\AuthAction;
+use Lits\Action\AuthDatabaseAction;
 use Lits\Data\ShelfData;
 use Lits\Data\SpaceData;
 use Lits\Data\TrayData;
@@ -15,7 +15,7 @@ use Slim\Exception\HttpNotFoundException;
 
 use function Latitude\QueryBuilder\field;
 
-final class TraySpaceAction extends AuthAction
+final class TraySpaceAction extends AuthDatabaseAction
 {
     /**
      * @throws HttpBadRequestException

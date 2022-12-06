@@ -11,7 +11,7 @@ use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
 use function Latitude\QueryBuilder\group;
 
-final class IndexAction extends AuthAction
+final class IndexAction extends AuthDatabaseAction
 {
     /** @throws HttpInternalServerErrorException */
     public function action(): void
