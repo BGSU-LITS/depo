@@ -1,0 +1,75 @@
+{% if date|date_modify('first day of this month') == date_start and date|date_modify('last day of this month') == date_end %}
+{% set title = date|date('F Y') %}
+{% set month = true %}
+{% else %}
+{% set title = date_start|date('F j, Y') ~ ' through ' ~ date_end|date('F j, Y') %}
+{% endif %}
+{% extends 'page.html.twig' %}
+
+{% block scripts %}
+{{ parent() }}
+<script src="/template/2.0.0-b7/flatpickr.js"></script>
+<script>
+document.querySelectorAll('#start, #end').forEach(element => {
+    bgsu_flatpickr.setup(element, {
+        altFormat: 'F j, Y',
+        altInput: true,
+        minDate: '{{ date_first|date("Y-m-d") }}',
+        maxDate: '{{ date_last|date_modify("last day of this month")|date("Y-m-d") }}',
+    });
+});
+</script>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="bgsu_common_list_breadcrumb">
+        <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li><a href="{{ url_for('changes') }}">Changes</a></li><li aria-current="page">{{ title }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+{{ parent() }}
+
+<div class="bgsu_common__narrow">
+<table class="bgsu_common_table bgsu_common__full">
+<tbody>
+{% for catalog in catalogs %}
+<tr>
+    <th rowspan="3">{{ catalog.name }}</th>
+{% for state in ['accession', 'deaccession', 'update'] %}
+    <td>{{ state|title }}s</td>
+    <td class="bgsu_common__figure">{{ total[catalog.id][state]|number_format }}</td>
+</tr>
+{% if not loop.last %}
+<tr>
+{% endif %}
+{% endfor %}
+{% endfor %}
+</tbody>
+</table>
+
+{% if month %}
+{% include 'includes/dates.html.twig' %}
+{% endif %}
+</div>
+
+<div class="bgsu_common__screen bgsu_common__closer">
+<h2>Date Range</h2>
+<form method="get" class="bgsu_common_form">
+<div class="bgsu_common_form_table">
+<div>
+<label for="start">From:</label>
+<div><input type="text" id="start" name="start" value="{{ date_start|date('Y-m-d') }}"></div>
+</div>
+<div>
+<label for="end">Through:</label>
+<div><input type="text" id="end" name="end" value="{{ date_end|date('Y-m-d') }}"></div>
+</div>
+</div>
+<p><button type="submit" class="bgsu_common_button bgsu_common_button__primary">View</button></p>
+</form>
+</div>
+
+{% endblock %}

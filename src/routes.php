@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Lits\Action\CatalogsAction;
+use Lits\Action\ChangesAction;
 use Lits\Action\IndexAction;
 use Lits\Action\ItemsAction;
 use Lits\Action\MonthAction;
@@ -36,14 +37,17 @@ return function (Framework $framework): void {
         ->setArgument('auth', 'admin');
 
     $framework->app()
-        ->get('/month', MonthAction::class)
-        ->setName('month');
+        ->get('/changes', ChangesAction::class)
+        ->setName('changes');
 
     $framework->app()
         ->get('/items[/{barcode}]', ItemsAction::class)
         ->setName('items');
 
     ItemsAction::addFileRoutes($framework->app(), '/items/{barcode}');
+
+    $framework->app()
+        ->get('/month', MonthAction::class);
 
     $framework->app()
         ->get('/shelves/missing', MissingShelvesAction::class)
