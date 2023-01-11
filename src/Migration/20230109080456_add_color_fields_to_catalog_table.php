@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Migration;
+
+use Phoenix\Exception\InvalidArgumentValueException;
+use Phoenix\Migration\AbstractMigration;
+
+class AddColorFieldsToCatalogTable extends AbstractMigration
+{
+    /** @throws InvalidArgumentValueException */
+    protected function up(): void
+    {
+        $this->table('catalog')
+            ->addColumn('color1', 'string', ['length' => 255, 'null' => true])
+            ->addColumn('color2', 'string', ['length' => 255, 'null' => true])
+            ->save();
+    }
+
+    protected function down(): void
+    {
+        $this->table('catalog')
+            ->dropColumn('color1')
+            ->dropColumn('color2')
+            ->save();
+    }
+}

@@ -14,7 +14,9 @@ Array.prototype.forEach.call(
             var fields = [
                 'id',
                 'name',
-                'url'
+                'url',
+                'color1',
+                'color2'
             ];
 
             fields.forEach(function(field) {
@@ -49,16 +51,20 @@ Array.prototype.forEach.call(
             <th>ID</th>
             <th>Name</th>
             <th>URL</th>
+            <th>Color 1</th>
+            <th>Color 2</th>
         </tr>
     </thead>
     <tbody>
 {% for catalog in catalogs %}
         <tr>
             <td>
-                <a{% if auth.is('admin') %} href="#"{% endif %} data-id="{{ catalog.id }}" data-name="{{ catalog.name }}" data-url="{{ catalog.url }}">{{ catalog.id }}</a>
+                <a{% if auth.is('admin') %} href="#"{% endif %} data-id="{{ catalog.id }}" data-name="{{ catalog.name }}" data-url="{{ catalog.url }}" data-color1="{{ catalog.color1 }}" data-color2="{{ catalog.color2 }}">{{ catalog.id }}</a>
             </td>
             <td>{{ catalog.name }}</td>
             <td><a href="{{ catalog.url }}">{{ catalog.url }}</a></td>
+            <td><div style="background:{{ catalog.color1 }}">&nbsp;</div></td>
+            <td><div style="background:{{ catalog.color2 }}">&nbsp;</div></td>
         </tr>
 {% endfor %}
     </tbody>
@@ -69,16 +75,24 @@ Array.prototype.forEach.call(
     <h2>Manage Catalog</h2>
     <div class="bgsu_common_form_table">
         <div>
-            <label for="id">ID:</label><br>
+            <label for="id">ID:</label>
             <div><input type="text" id="id" name="id" size="8" maxlength="8"></div>
         </div>
         <div>
-            <label for="name">Name:</label><br>
+            <label for="name">Name:</label>
             <div><input type="text" id="name" name="name" size="64" maxlength="255"></div>
         </div>
         <div>
-            <label for="name">URL:</label><br>
+            <label for="name">URL:</label>
             <div><input type="url" id="url" name="url" size="64" maxlength="255"></div>
+        </div>
+        <div>
+            <label for="color1">Color 1:</label>
+            <div><input type="color" id="color1" name="color1" value="#000000"></div>
+        </div>
+        <div>
+            <label for="color2">Color 2:</label>
+            <div><input type="color" id="color2" name="color2" value="#000000"></div>
         </div>
     </div>
     <button type="submit" name="update" class="bgsu_common_button bgsu_common_button__arrow bgsu_common_button__primary">Update</button>

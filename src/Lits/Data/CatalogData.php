@@ -14,6 +14,8 @@ final class CatalogData extends DatabaseData
     public string $id;
     public string $name;
     public string $url;
+    public ?string $color1 = null;
+    public ?string $color2 = null;
 
     /**
      * @param array<string, string|null> $row
@@ -50,6 +52,9 @@ final class CatalogData extends DatabaseData
 
         $catalog->url = $data;
 
+        $catalog->color1 = self::findRowString($row, 'color1');
+        $catalog->color2 = self::findRowString($row, 'color2');
+
         return $catalog;
     }
 
@@ -70,6 +75,8 @@ final class CatalogData extends DatabaseData
                 'id' => $this->id,
                 'name' => $this->name,
                 'url' => $this->url,
+                'color1' => $this->color1,
+                'color2' => $this->color2,
             ]);
         } catch (DuplicateInsertException $exception) {
             $this->database->update(
@@ -77,6 +84,8 @@ final class CatalogData extends DatabaseData
                 [
                     'name' => $this->name,
                     'url' => $this->url,
+                    'color1' => $this->color1,
+                    'color2' => $this->color2,
                 ],
                 'id',
                 $this->id,
