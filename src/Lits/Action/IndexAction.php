@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lits\Action;
 
+use Lits\Data\CatalogData;
 use Slim\Exception\HttpInternalServerErrorException;
 
 use function Latitude\QueryBuilder\alias;
@@ -27,6 +28,10 @@ final class IndexAction extends AuthDatabaseAction
             'total' => null,
             'total_location' => $this->total(),
             'total_catalog' => [],
+            'catalogs' => CatalogData::all(
+                $this->settings,
+                $this->database
+            ),
         ];
 
         foreach ($context['total_location'] as $catalog => $totals) {

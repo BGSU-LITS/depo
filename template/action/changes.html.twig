@@ -8,7 +8,8 @@
 
 {% block scripts %}
 {{ parent() }}
-<script src="/template/2.0.0-b7/flatpickr.js"></script>
+<script src="{{ bgsu_template_path }}flatpickr.js"></script>
+<script src="{{ bgsu_template_path }}chart.js"></script>
 <script>
 document.querySelectorAll('#start, #end').forEach(element => {
     bgsu_flatpickr.setup(element, {
@@ -18,11 +19,140 @@ document.querySelectorAll('#start, #end').forEach(element => {
         maxDate: '{{ date_last|date_modify("last day of this month")|date("Y-m-d") }}',
     });
 });
+
+const styles = {
+{% for catalog in catalogs %}
+    {{ catalog.id }}: {
+        accession: bgsu_chart.pattern(
+            'diagonal-right-left',
+            '{{ catalogs[catalog.id].color1 }}'
+        ),
+        deaccession: bgsu_chart.pattern(
+            'diagonal',
+            '{{ catalogs[catalog.id].color1 }}',
+        ),
+        update: '{{ catalogs[catalog.id].color1 }}',
+    },
+{% endfor %}
+};
+
+window.addEventListener('load', () => {
+{% for catalog in catalogs %}
+{% for state in ['accession', 'deaccession', 'update'] %}
+    bgsu_chart.fill(
+        '#fill_{{ catalog.id }}_{{ state }}',
+        styles['{{ catalog.id }}']['{{ state }}']
+    );
+{% endfor %}
+{% endfor %}
+});
+
+const chart = bgsu_chart.setup(
+    document.querySelector('#chart canvas'),
+    {
+        type: 'bar',
+        data: {
+            labels: [
+{% for date in chart_dates %}
+                '{{ date }}',
+{% endfor %}
+            ],
+            datasets: [
+{% for catalog in catalogs %}
+{% for state in ['accession', 'deaccession', 'update'] %}
+                {
+                    backgroundColor: styles['{{ catalog.id }}']['{{ state }}'],
+                    data: [
+{% for date in chart_dates %}
+                        {{ chart[catalog.id][state][date]|default(0) }},
+{% endfor %}
+                    ],
+                    label: '{{ catalog.id|upper }} {{ state|capitalize }}s',
+                    order: {{ catalog.id == 'ohdep' ? 1 : 2 }},
+                    stack: '{{ state|capitalize }}s',
+                },
+{% endfor %}
+{% endfor %}
+            ],
+        },
+        options: {
+            animation: {
+                duration: 0,
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    callbacks: {
+                        footer: function(items) {
+                            const values = Object.values(
+                                items[0].parsed._stacks.y._visualValues
+                            );
+
+                            return 'Total ' + items[0].dataset.stack + ': ' +
+                                values.reduce((a, b) => a + b, 0)
+                                    .toLocaleString();
+                        }
+                    }
+                },
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: {
+                        callback: function(value, index) {
+                            const text = this.getLabelForValue(value);
+
+                            if (text.length === 10) {
+                                return new Date(text).toLocaleDateString(
+                                    'en-US',
+                                    {
+                                        month: 'numeric',
+                                        day: 'numeric',
+                                        timeZone: 'UTC'
+                                    }
+                                );
+                            }
+
+                            return text;
+                        }
+                    }
+                },
+                y: {
+                    stacked: true,
+                },
+            },
+        },
+    },
+);
+
+window.addEventListener('beforeprint', () => {
+    chart.resize(800, 400);
+});
+
+window.addEventListener('afterprint', () => {
+    chart.resize();
+});
 </script>
 {% endblock %}
 
+{% block styles %}
+<style>
+@media print {
+    footer, header {
+        display: none !important;
+    }
+
+    #content h1 {
+        margin: 0;
+    }
+}
+</style>
+{% endblock %}
+
 {% block breadcrumb %}
-<nav aria-label="breadcrumb">
+<nav aria-label="breadcrumb" class="bgsu_common__screen">
     <ol class="bgsu_common_list_breadcrumb">
         <li><a href="{{ url_for('index') }}">{{ settings.template.site }}</a></li><li><a href="{{ url_for('changes') }}">Changes</a></li><li aria-current="page">{{ title }}</li>
     </ol>
@@ -32,15 +162,17 @@ document.querySelectorAll('#start, #end').forEach(element => {
 {% block content %}
 {{ parent() }}
 
-<div class="bgsu_common__narrow">
+<div class="bgsu_common__flex_large bgsu_common__gap bgsu_common__narrow">
+<div>
 <table class="bgsu_common_table bgsu_common__full">
 <tbody>
 {% for catalog in catalogs %}
 <tr>
-    <th rowspan="3">{{ catalog.name }}</th>
+    <th rowspan="3" class="bgsu_common__nowrap">{{ catalog.name }}</th>
 {% for state in ['accession', 'deaccession', 'update'] %}
     <td>{{ state|title }}s</td>
     <td class="bgsu_common__figure">{{ total[catalog.id][state]|number_format }}</td>
+    <td id="fill_{{ catalog.id }}_{{ state }}" class="color"></td>
 </tr>
 {% if not loop.last %}
 <tr>
@@ -55,7 +187,7 @@ document.querySelectorAll('#start, #end').forEach(element => {
 {% endif %}
 </div>
 
-<div class="bgsu_common__screen bgsu_common__closer">
+<div class="bgsu_common__screen">
 <h2>Date Range</h2>
 <form method="get" class="bgsu_common_form">
 <div class="bgsu_common_form_table">
@@ -70,6 +202,11 @@ document.querySelectorAll('#start, #end').forEach(element => {
 </div>
 <p><button type="submit" class="bgsu_common_button bgsu_common_button__primary">View</button></p>
 </form>
+</div>
+</div>
+
+<div id="chart">
+<canvas></canvas>
 </div>
 
 {% endblock %}

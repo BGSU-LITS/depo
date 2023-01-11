@@ -1,9 +1,106 @@
 {% set title = date|date('F Y') %}
 {% extends 'page.html.twig' %}
 
+{% block scripts %}
+{{ parent() }}
+
+<script src="{{ bgsu_template_path }}chart.js"></script>
+<script>
+const options = {
+    animation: {
+        duration: 0,
+    },
+    elements: {
+        arc: {
+            borderWidth: 0,
+        },
+    },
+    plugins: {
+        legend: {
+            display: false,
+        },
+        tooltip: {
+            callbacks: {
+                label: (context) => context.formattedValue + ' ft³',
+            },
+        },
+    },
+};
+
+bgsu_chart.setup(
+    document.querySelector('#chart canvas'),
+    {
+        type: 'doughnut',
+        data: {
+            labels: [
+                'Free Space',
+                'Used Space',
+            ],
+            datasets: [
+                {
+                    backgroundColor: [
+                        '#CFD4DA',
+                        '#6c757d',
+                    ],
+                    data: [
+                        {{ total.freeSpace|round }},
+                        {{ total.usedSpace|round }},
+                    ],
+                },
+            ],
+        },
+        options: options,
+    },
+);
+
+{% for type in ['used', 'free', 'total'] %}
+bgsu_chart.setup(
+    document.querySelector('#chart_{{ type }} canvas'),
+    {
+        type: 'doughnut',
+        data: {
+            labels: [
+{% for space in spaces %}
+                '{{ space.tray.name }} {{ type|capitalize }}',
+{% endfor %}
+            ],
+            datasets: [
+                {
+                    backgroundColor: [
+{% for space in spaces %}
+                        '{{ space.tray.color }}',
+{% endfor %}
+                    ],
+                    data: [
+{% for space in spaces %}
+                        {{ attribute(space, type)|round }},
+{% endfor %}
+                    ],
+                },
+            ],
+        },
+        options: options,
+    },
+);
+{% endfor %}
+</script>
+{% endblock %}
+
 {% block styles %}
 {{ parent() }}
 {% include 'includes/styles/trays.html.twig' %}
+
+<style>
+#charts td {
+    border: none;
+    text-align: center;
+}
+
+#charts div {
+    height: 250px;
+    width: 250px;
+}
+</style>
 {% endblock %}
 
 {% block breadcrumb %}
@@ -28,9 +125,9 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th colspan="3" class="bgsu_common__center">Used</th>
-            <th colspan="3" class="bgsu_common__center">Free</th>
-            <th colspan="3" class="bgsu_common__center">Total</th>
+{% for type in ['used', 'free', 'total'] %}
+            <th colspan="3" class="bgsu_common__center">{{ type|capitalize }}</th>
+{% endfor %}
         </tr>
     </thead>
     <tbody>
@@ -58,6 +155,17 @@
             <td colspan="3" class="bgsu_common__figure"><strong>{{ _self.approx(total.freeSpace) }}</strong></td>
             <td colspan="3" class="bgsu_common__figure"><strong>{{ _self.approx(total.totalSpace) }}</strong></td>
         </tr>
+        <tr id="charts">
+            <td colspan="2">
+                <div id="chart" aria-labelledby="chart_label"><canvas></canvas></div>
+                <p id="chart_label">Free and Used Space</p>
+            </td>
+{% for type in ['used', 'free', 'total'] %}
+            <td colspan="3">
+                <div id="chart_{{ type }}" aria-labelledby="chart_{{ type }}_label"><canvas></canvas></div>
+                <p id="chart_{{ type }}_label">{{ type|capitalize }} Space by Type</p>
+            </td>
+{% endfor %}
     </tfoot>
 </table>
 
