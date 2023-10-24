@@ -29,6 +29,11 @@ return function (Framework $framework): void {
         ->setName('index');
 
     $framework->app()
+        ->get('/iframe', IndexAction::class)
+        ->setArgument('auth', 'null')
+        ->setName('iframe');
+
+    $framework->app()
         ->get('/catalogs', CatalogsAction::class)
         ->setName('catalogs');
 

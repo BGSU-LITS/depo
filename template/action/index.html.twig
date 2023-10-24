@@ -74,6 +74,7 @@ bgsu_chart.setup(
 
 #chart {
     flex: 0 0 400px;
+    max-width: 500px;
 }
 </style>
 {% endblock %}
@@ -127,7 +128,7 @@ bgsu_chart.setup(
 </tr>
 </tfoot>
 </table>
-<p>As of <a href="{{ url_for('changes') }}">{{ updated|date('F j, Y') }}</a>.</p>
+<p>As of {% if not iframe %}<a href="{{ url_for('changes') }}">{% endif %}{{ updated|date('F j, Y') }}{% if not iframe %}</a>{% endif %}.</p>
 </div>
 <div id="chart">
 <canvas></canvas>

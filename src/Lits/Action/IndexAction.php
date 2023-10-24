@@ -6,6 +6,7 @@ namespace Lits\Action;
 
 use Lits\Data\CatalogData;
 use Slim\Exception\HttpInternalServerErrorException;
+use Slim\Routing\RouteContext;
 
 use function Latitude\QueryBuilder\alias;
 use function Latitude\QueryBuilder\field;
@@ -23,7 +24,10 @@ final class IndexAction extends AuthDatabaseAction
                 ->from('item')
         );
 
+        $route = RouteContext::fromRequest($this->request)->getRoute();
+
         $context = [
+            'iframe' => $route->getName() === 'iframe',
             'updated' => $statement->fetchColumn(),
             'total' => null,
             'total_location' => $this->total(),
