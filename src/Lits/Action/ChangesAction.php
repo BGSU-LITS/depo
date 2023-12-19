@@ -8,7 +8,6 @@ use Latitude\QueryBuilder\ExpressionInterface;
 use Lits\Data\CatalogData;
 use Safe\DateTimeImmutable;
 use Safe\Exceptions\DatetimeException;
-use Safe\Exceptions\StringsException;
 use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpInternalServerErrorException;
 
@@ -16,7 +15,6 @@ use function Latitude\QueryBuilder\alias;
 use function Latitude\QueryBuilder\express;
 use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
-use function Safe\substr;
 
 final class ChangesAction extends AuthDatabaseAction
 {
@@ -36,7 +34,7 @@ final class ChangesAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
@@ -52,7 +50,7 @@ final class ChangesAction extends AuthDatabaseAction
 
         $context['catalogs'] = CatalogData::all(
             $this->settings,
-            $this->database
+            $this->database,
         );
 
         try {
@@ -64,25 +62,25 @@ final class ChangesAction extends AuthDatabaseAction
 
             $context['total'] = $this->total(
                 $context['date_start'],
-                $context['date_end']
+                $context['date_end'],
             );
 
             $context['chart'] = $this->chart(
                 $context['date_start'],
                 $context['date_end'],
-                $context['date_days']
+                $context['date_days'],
             );
 
             $context['chart_dates'] = self::chartDates(
                 $context['date_start'],
                 $context['date_end'],
-                $context['date_days']
+                $context['date_days'],
             );
         } catch (DatetimeException $exception) {
             throw new HttpBadRequestException(
                 $this->request,
                 'Could not retrieve totals',
-                $exception
+                $exception,
             );
         }
 
@@ -105,7 +103,7 @@ final class ChangesAction extends AuthDatabaseAction
                 throw new HttpBadRequestException(
                     $this->request,
                     'Invalid start date specified',
-                    $exception
+                    $exception,
                 );
             }
         }
@@ -129,7 +127,7 @@ final class ChangesAction extends AuthDatabaseAction
                 throw new HttpBadRequestException(
                     $this->request,
                     'Invalid end date specified',
-                    $exception
+                    $exception,
                 );
             }
         }
@@ -143,7 +141,7 @@ final class ChangesAction extends AuthDatabaseAction
      */
     private function total(
         DateTimeImmutable $start,
-        DateTimeImmutable $end
+        DateTimeImmutable $end,
     ): array {
         $total = [];
 
@@ -164,7 +162,7 @@ final class ChangesAction extends AuthDatabaseAction
     private function chart(
         DateTimeImmutable $start,
         DateTimeImmutable $end,
-        int $days
+        int $days,
     ): array {
         $chart = [];
 
@@ -195,7 +193,7 @@ final class ChangesAction extends AuthDatabaseAction
     private function statement(
         DateTimeImmutable $start,
         DateTimeImmutable $end,
-        array $group_by
+        array $group_by,
     ): \PDOStatement {
         return $this->database->execute(
             $this->database->query
@@ -203,15 +201,15 @@ final class ChangesAction extends AuthDatabaseAction
                     'catalog_id',
                     'state',
                     'updated',
-                    alias(func('COUNT', '*'), 'total')
+                    alias(func('COUNT', '*'), 'total'),
                 )
                 ->from('item')
                 ->where(field('updated')->between(
                     $start->format('Y-m-d'),
-                    $end->format('Y-m-d')
+                    $end->format('Y-m-d'),
                 ))
                 ->andWhere(field('state')->isNotNull())
-                ->groupBy(...$group_by)
+                ->groupBy(...$group_by),
         );
     }
 
@@ -241,7 +239,7 @@ final class ChangesAction extends AuthDatabaseAction
     private static function rowChart(
         array $row,
         array $chart,
-        int $days
+        int $days,
     ): array {
         if (
             isset($row['catalog_id']) &&
@@ -260,15 +258,11 @@ final class ChangesAction extends AuthDatabaseAction
 
     private static function updated(string $updated, int $days): string
     {
-        try {
-            return substr(
-                $updated,
-                0,
-                $days > 365 ? 4 : ($days > 31 ? 7 : 10)
-            );
-        } catch (StringsException $exception) {
-            return $updated;
-        }
+        return \substr(
+            $updated,
+            0,
+            $days > 365 ? 4 : ($days > 31 ? 7 : 10),
+        );
     }
 
     /**
@@ -278,7 +272,7 @@ final class ChangesAction extends AuthDatabaseAction
     private static function chartDates(
         DateTimeImmutable $start,
         DateTimeImmutable $end,
-        int $days
+        int $days,
     ): array {
         $dates = [];
         $format = 'Y-m-d';

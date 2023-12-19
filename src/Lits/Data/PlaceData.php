@@ -42,20 +42,20 @@ final class PlaceData extends DatabaseData
     public static function fromBarcode(
         string $barcode,
         Settings $settings,
-        Database $database
+        Database $database,
     ): ?self {
         try {
             if (preg_match(self::PATTERN_BARCODE, $barcode, $matches) === 1) {
                 $place = new static($settings, $database);
 
-                $place->module = (string) ($matches['module'] ?? '');
-                $place->side = (string) ($matches['side'] ?? '');
-                $place->section = (string) ($matches['section'] ?? '');
-                $place->shelf = (string) ($matches['shelf'] ?? '');
-                $place->tray = (string) ($matches['tray'] ?? '');
+                $place->module = $matches['module'] ?? '';
+                $place->side = $matches['side'] ?? '';
+                $place->section = $matches['section'] ?? '';
+                $place->shelf = $matches['shelf'] ?? '';
+                $place->tray = $matches['tray'] ?? '';
 
                 if (isset($matches['item'])) {
-                    $place->item = (string) $matches['item'];
+                    $place->item = $matches['item'];
                 }
 
                 return $place;
@@ -64,7 +64,7 @@ final class PlaceData extends DatabaseData
             throw new InvalidDataException(
                 'Could not parse barcode',
                 0,
-                $exception
+                $exception,
             );
         }
 
@@ -77,10 +77,10 @@ final class PlaceData extends DatabaseData
             $place = self::fromBarcode(
                 $barcode,
                 $item->settings,
-                $item->database
+                $item->database,
             );
 
-            if ($place instanceof PlaceData) {
+            if ($place instanceof self) {
                 $place->item_id = $item->id;
 
                 return $place;
@@ -98,7 +98,7 @@ final class PlaceData extends DatabaseData
     {
         if (\is_null($this->item_id)) {
             throw new InvalidDataException(
-                'An item_id has not been set for the place data'
+                'An item_id has not been set for the place data',
             );
         }
 
@@ -115,7 +115,7 @@ final class PlaceData extends DatabaseData
                 'tray' => $this->tray,
                 'item' => $this->item,
             ],
-            'item_id'
+            'item_id',
         );
     }
 }

@@ -29,7 +29,7 @@ final class SpaceData extends DatabaseData
     public static function fromRow(
         array $row,
         Settings $settings,
-        Database $database
+        Database $database,
     ): self {
         $space = new static($settings, $database);
         $space->tray = TrayData::fromRow($row, $settings, $database);
@@ -68,12 +68,12 @@ final class SpaceData extends DatabaseData
     public static function fromTrayId(
         string $tray_id,
         Settings $settings,
-        Database $database
+        Database $database,
     ): self {
         $statement = $database->execute(
             $database->query
                 ->select(func('MAX', 'updated'))
-                ->from('space')
+                ->from('space'),
         );
 
         try {
@@ -82,7 +82,7 @@ final class SpaceData extends DatabaseData
             throw new InvalidDataException(
                 'Could not determine updated date',
                 0,
-                $exception
+                $exception,
             );
         }
 
@@ -92,12 +92,12 @@ final class SpaceData extends DatabaseData
                     'tray.*',
                     alias(func('MAX', 'space.updated'), 'updated'),
                     alias(func('SUM', 'space.used'), 'used'),
-                    alias(func('COUNT', '*'), 'shelves')
+                    alias(func('COUNT', '*'), 'shelves'),
                 )
                 ->from('space')
                 ->join('tray', on('space.tray_id', 'tray.id'))
                 ->where(field('space.tray_id')->eq($tray_id))
-                ->andWhere(field('space.updated')->eq($date->format('Y-m-d')))
+                ->andWhere(field('space.updated')->eq($date->format('Y-m-d'))),
         );
 
         /** @var array<string, string|null>|false $row */
@@ -171,7 +171,7 @@ final class SpaceData extends DatabaseData
     public static function all(
         Settings $settings,
         Database $database,
-        DateTimeImmutable $date
+        DateTimeImmutable $date,
     ): array {
         $statement = $database->execute(
             $database->query
@@ -179,7 +179,7 @@ final class SpaceData extends DatabaseData
                     'tray.*',
                     alias(func('MAX', 'space.updated'), 'updated'),
                     alias(func('SUM', 'space.used'), 'used'),
-                    alias(func('COUNT', '*'), 'shelves')
+                    alias(func('COUNT', '*'), 'shelves'),
                 )
                 ->from('space')
                 ->join('tray', on('space.tray_id', 'tray.id'))
@@ -187,10 +187,10 @@ final class SpaceData extends DatabaseData
                     $date->modify('first day of this month')
                         ->format('Y-m-d'),
                     $date->modify('last day of this month')
-                        ->format('Y-m-d')
+                        ->format('Y-m-d'),
                 ))
                 ->groupBy('tray.id')
-                ->orderBy('tray.id')
+                ->orderBy('tray.id'),
         );
 
         $result = [];

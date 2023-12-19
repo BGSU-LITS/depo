@@ -24,7 +24,7 @@ final class CatalogData extends DatabaseData
     public static function fromRow(
         array $row,
         Settings $settings,
-        Database $database
+        Database $database,
     ): self {
         $catalog = new static($settings, $database);
 
@@ -78,7 +78,7 @@ final class CatalogData extends DatabaseData
                 'color1' => $this->color1,
                 'color2' => $this->color2,
             ]);
-        } catch (DuplicateInsertException $exception) {
+        } catch (DuplicateInsertException) {
             $this->database->update(
                 'catalog',
                 [
@@ -100,7 +100,7 @@ final class CatalogData extends DatabaseData
             $database->query
                 ->select()
                 ->from('catalog')
-                ->orderBy('id', 'ASC')
+                ->orderBy('id', 'ASC'),
         );
 
         $result = [];

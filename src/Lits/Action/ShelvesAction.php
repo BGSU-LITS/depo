@@ -32,7 +32,7 @@ final class ShelvesAction extends AuthDatabaseAction
         if (isset($this->data['module'])) {
             $context['module'] = $this->module(
                 $this->data['module'],
-                $context['modules']
+                $context['modules'],
             );
 
             $context['sides'] = $this->sides($context['module']);
@@ -41,27 +41,27 @@ final class ShelvesAction extends AuthDatabaseAction
                 $context['side'] = $this->side(
                     $this->data['side'],
                     $context['module'],
-                    $context['sides']
+                    $context['sides'],
                 );
 
                 $context['sections'] = $this->sections(
                     $context['module'],
-                    $context['side']
+                    $context['side'],
                 );
 
                 $context['shelves'] = $this->shelves(
                     $context['module'],
-                    $context['side']
+                    $context['side'],
                 );
 
                 $context['missing'] = $this->missing(
                     $context['module'],
-                    $context['side']
+                    $context['side'],
                 );
 
                 $context['trays'] = TrayData::all(
                     $this->settings,
-                    $this->database
+                    $this->database,
                 );
             }
         } elseif (\count($context['modules']) === 1) {
@@ -76,7 +76,7 @@ final class ShelvesAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
@@ -88,7 +88,7 @@ final class ShelvesAction extends AuthDatabaseAction
     public function post(
         ServerRequest $request,
         Response $response,
-        array $data
+        array $data,
     ): Response {
         $this->setup($request, $response, $data);
 
@@ -102,7 +102,7 @@ final class ShelvesAction extends AuthDatabaseAction
             $shelf = ShelfData::fromRow(
                 $post,
                 $this->settings,
-                $this->database
+                $this->database,
             );
 
             $shelf->save();
@@ -114,7 +114,7 @@ final class ShelvesAction extends AuthDatabaseAction
             } else {
                 $this->message(
                     'success',
-                    'Updated ' . $name . ' to Tray Type ' . $shelf->tray_id
+                    'Updated ' . $name . ' to Tray Type ' . $shelf->tray_id,
                 );
             }
 
@@ -122,20 +122,20 @@ final class ShelvesAction extends AuthDatabaseAction
                 $this->routeCollector->getRouteParser()->urlFor('shelves', [
                     'module' => $shelf->module,
                     'side' => $shelf->side,
-                ])
+                ]),
             );
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
 
         return $this->response;
     }
 
-    /** @return mixed[] */
+    /** @return array<mixed> */
     private function modules(): array
     {
         $statement = $this->database->execute(
@@ -143,14 +143,14 @@ final class ShelvesAction extends AuthDatabaseAction
                 ->select('module')
                 ->distinct()
                 ->from('shelf')
-                ->orderBy('module', 'ASC')
+                ->orderBy('module', 'ASC'),
         );
 
         return self::column($statement);
     }
 
     /**
-     * @param mixed[] $modules
+     * @param array<mixed> $modules
      * @throws HttpNotFoundException
      */
     private function module(string $module, array $modules): string
@@ -158,14 +158,14 @@ final class ShelvesAction extends AuthDatabaseAction
         if (!\in_array($module, $modules, true)) {
             throw new HttpNotFoundException(
                 $this->request,
-                'Module ' . $module . 'could not be found'
+                'Module ' . $module . 'could not be found',
             );
         }
 
         return $module;
     }
 
-    /** @return mixed[] */
+    /** @return array<mixed> */
     private function sides(string $module): array
     {
         $statement = $this->database->execute(
@@ -174,14 +174,14 @@ final class ShelvesAction extends AuthDatabaseAction
                 ->distinct()
                 ->from('shelf')
                 ->where(field('module')->eq($module))
-                ->orderBy('side', 'ASC')
+                ->orderBy('side', 'ASC'),
         );
 
         return self::column($statement);
     }
 
     /**
-     * @param mixed[] $sides
+     * @param array<mixed> $sides
      * @throws HttpNotFoundException
      */
     private function side(string $side, string $module, array $sides): string
@@ -189,14 +189,14 @@ final class ShelvesAction extends AuthDatabaseAction
         if (!\in_array($side, $sides, true)) {
             throw new HttpNotFoundException(
                 $this->request,
-                'Side ' . $side . ' could not be found in Module ' . $module
+                'Side ' . $side . ' could not be found in Module ' . $module,
             );
         }
 
         return $side;
     }
 
-    /** @return mixed[] */
+    /** @return array<mixed> */
     private function sections(string $module, string $side): array
     {
         $statement = $this->database->execute(
@@ -206,13 +206,13 @@ final class ShelvesAction extends AuthDatabaseAction
                 ->from('shelf')
                 ->where(field('module')->eq($module))
                 ->andWhere(field('side')->eq($side))
-                ->orderBy('section', 'ASC')
+                ->orderBy('section', 'ASC'),
         );
 
         return self::column($statement);
     }
 
-    /** @return string[][] */
+    /** @return array<array<string>> */
     private function shelves(string $module, string $side): array
     {
         $statement = $this->database->execute(
@@ -222,26 +222,26 @@ final class ShelvesAction extends AuthDatabaseAction
                 ->where(field('module')->eq($module))
                 ->andWhere(field('side')->eq($side))
                 ->orderBy('shelf', 'ASC')
-                ->orderBy('section', 'ASC')
+                ->orderBy('section', 'ASC'),
         );
 
         $statement->setFetchMode(
             \PDO::FETCH_CLASS,
             ShelfData::class,
-            [$this->settings, $this->database]
+            [$this->settings, $this->database],
         );
 
         $result = [];
 
-        /** @var ShelfData $row */
-        foreach ($statement as $row) {
+        while ($row = $statement->fetch()) {
+            \assert($row instanceof ShelfData);
             $result[$row->shelf][$row->section] = $row->tray_id ?? '';
         }
 
         return $result;
     }
 
-    /** @return int[][] */
+    /** @return array<array<int>> */
     private function missing(string $module, string $side): array
     {
         $statement = $this->database->execute(
@@ -249,7 +249,7 @@ final class ShelvesAction extends AuthDatabaseAction
                 ->select(
                     'place.section',
                     'place.shelf',
-                    alias(func('COUNT', '*'), 'total')
+                    alias(func('COUNT', '*'), 'total'),
                 )
                 ->from('item')
                 ->join('place', on('item.id', 'place.item_id'))
@@ -258,30 +258,27 @@ final class ShelvesAction extends AuthDatabaseAction
                     on('place.module', 'shelf.module')
                         ->and(on('place.side', 'shelf.side'))
                         ->and(on('place.section', 'shelf.section'))
-                        ->and(on('place.shelf', 'shelf.shelf'))
+                        ->and(on('place.shelf', 'shelf.shelf')),
                 )
                 ->where(field('item.newest')->eq(true))
                 ->andWhere(group(field('item.state')->isNull()->or(
-                    field('item.state')->notEq('deaccession')
+                    field('item.state')->notEq('deaccession'),
                 )))
                 ->andWhere(field('place.module')->eq($module))
                 ->andWhere(field('place.side')->eq($side))
                 ->andWhere(field('shelf.tray_id')->isNull())
                 ->groupBy('place.section', 'place.shelf')
                 ->orderBy('place.section', 'ASC')
-                ->orderBy('place.shelf', 'ASC')
+                ->orderBy('place.shelf', 'ASC'),
         );
 
         $result = [];
 
         $rows = $statement->fetchAll(\PDO::FETCH_OBJ);
 
-        if (\is_array($rows)) {
-            /** @var \stdClass $row */
-            foreach ($rows as $row) {
-                $result[(string) $row->shelf][(string) $row->section] =
-                    (int) $row->total;
-            }
+        foreach ($rows as $row) {
+            $result[(string) $row->shelf][(string) $row->section] =
+                (int) $row->total;
         }
 
         return $result;
@@ -294,29 +291,21 @@ final class ShelvesAction extends AuthDatabaseAction
             $this->redirect(
                 $this->routeCollector->getRouteParser()->urlFor(
                     'shelves',
-                    ['module' => $module]
-                )
+                    ['module' => $module],
+                ),
             );
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
 
-    /** @return mixed[] */
+    /** @return array<mixed> */
     private static function column(\PDOStatement $statement): array
     {
-        $result = $statement->fetchAll(
-            \PDO::FETCH_COLUMN
-        );
-
-        if (\is_array($result)) {
-            return $result;
-        }
-
-        return [];
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 }

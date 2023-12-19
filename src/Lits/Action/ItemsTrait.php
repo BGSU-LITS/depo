@@ -17,7 +17,7 @@ use function Latitude\QueryBuilder\on;
 
 trait ItemsTrait
 {
-    /** @var string[] */
+    /** @var array<string> */
     private array $table_headers = [
         'Barcode',
         'Module',
@@ -63,7 +63,7 @@ trait ItemsTrait
     }
 
     /**
-     * @return mixed[][]
+     * @return array<array<mixed>>
      * @throws HttpInternalServerErrorException
      */
     protected function file(): array
@@ -71,20 +71,20 @@ trait ItemsTrait
         try {
             $statement = $this->database->execute($this->select());
 
-            /** @var mixed[][]|false $rows */
+            /** @var array<array<mixed>>|false $rows */
             $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(
                 $this->request,
                 'Could not fetch data from database',
-                $exception
+                $exception,
             );
         }
 
         if ($rows === false) {
             throw new HttpInternalServerErrorException(
                 $this->request,
-                'Could not fetch data from database'
+                'Could not fetch data from database',
             );
         }
 
@@ -117,8 +117,8 @@ trait ItemsTrait
                 on('place.item_id', 'item.id')
                     ->and(field('item.newest')->eq(true))
                     ->and(group(field('item.state')->isNull()->or(
-                        field('item.state')->notEq('deaccession')
-                    )))
+                        field('item.state')->notEq('deaccession'),
+                    ))),
             )
             ->join(
                 'barcode',
@@ -126,8 +126,8 @@ trait ItemsTrait
                     ->and(criteria(
                         '%s REGEXP %s',
                         identify('barcode.barcode'),
-                        PlaceData::PATTERN_BARCODE_MYSQL
-                    ))
+                        PlaceData::PATTERN_BARCODE_MYSQL,
+                    )),
             )
             ->orderBy('barcode.barcode');
     }

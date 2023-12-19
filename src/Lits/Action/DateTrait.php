@@ -23,7 +23,7 @@ trait DateTrait
     /** @throws HttpBadRequestException */
     public function date(
         string $table = 'item',
-        string $field = 'updated'
+        string $field = 'updated',
     ): DateTimeImmutable {
         if (\is_null($this->date)) {
             $this->date_first = $this->findDateFirst($table, $field);
@@ -33,14 +33,14 @@ trait DateTrait
             if (\is_null($this->date)) {
                 throw new HttpBadRequestException(
                     $this->request,
-                    'Invalid date requested'
+                    'Invalid date requested',
                 );
             }
 
             try {
                 $this->date_previous = $this->date->modify('previous month');
                 $this->date_next = $this->date->modify('next month');
-            } catch (DatetimeException $exception) {
+            } catch (DatetimeException) {
                 // @ignoreException
             }
         }
@@ -54,7 +54,7 @@ trait DateTrait
      */
     public function dateContext(
         string $table = 'item',
-        string $field = 'updated'
+        string $field = 'updated',
     ): array {
         return [
             'date' => $this->date($table, $field),
@@ -67,7 +67,7 @@ trait DateTrait
 
     private function findDateFirst(
         string $table,
-        string $field
+        string $field,
     ): ?DateTimeImmutable {
         if ($table === 'item' && $field === 'updated') {
             \assert($this->settings['depo'] instanceof DepoConfig);
@@ -78,14 +78,14 @@ trait DateTrait
         $statement = $this->database->execute(
             $this->database->query
                 ->select(func('MIN', $field))
-                ->from($table)
+                ->from($table),
         );
 
         try {
             return self::firstDayOfMonth(
-                (string) $statement->fetchColumn()
+                (string) $statement->fetchColumn(),
             );
-        } catch (InvalidDataException $exception) {
+        } catch (InvalidDataException) {
             // @ignoreException
         }
 
@@ -94,19 +94,19 @@ trait DateTrait
 
     private function findDateLast(
         string $table,
-        string $field
+        string $field,
     ): ?DateTimeImmutable {
         $statement = $this->database->execute(
             $this->database->query
                 ->select(func('MAX', $field))
-                ->from($table)
+                ->from($table),
         );
 
         try {
             return self::firstDayOfMonth(
-                (string) $statement->fetchColumn()
+                (string) $statement->fetchColumn(),
             );
-        } catch (InvalidDataException $exception) {
+        } catch (InvalidDataException) {
             // @ignoreException
         }
 
@@ -122,7 +122,7 @@ trait DateTrait
             $param = $this->request->getQueryParam('date');
 
             $date = self::firstDayOfMonth($param);
-        } catch (InvalidDataException $exception) {
+        } catch (InvalidDataException) {
             // @ignoreException
         }
 
@@ -152,7 +152,7 @@ trait DateTrait
             throw new InvalidDataException(
                 'Could not determine first day of month',
                 0,
-                $exception
+                $exception,
             );
         }
     }

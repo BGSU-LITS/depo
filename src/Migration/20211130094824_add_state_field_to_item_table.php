@@ -23,7 +23,7 @@ final class AddStateFieldToItemTable extends AbstractMigration
                 ['catalog_id', 'state'],
                 'state',
                 ['catalog_id', 'state'],
-                ForeignKey::RESTRICT
+                ForeignKey::RESTRICT,
             )
             ->addIndex(['catalog_id', 'location', 'newest', 'state'])
             ->save();

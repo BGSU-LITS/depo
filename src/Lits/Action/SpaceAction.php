@@ -27,7 +27,7 @@ final class SpaceAction extends AuthDatabaseAction
             $context['spaces'] = SpaceData::all(
                 $this->settings,
                 $this->database,
-                $this->date('space')
+                $this->date('space'),
             );
 
             $context['total'] = [
@@ -50,7 +50,7 @@ final class SpaceAction extends AuthDatabaseAction
 
             $context['trays'] = TrayData::all(
                 $this->settings,
-                $this->database
+                $this->database,
             );
 
             $this->render($this->template(), $context);
@@ -58,7 +58,7 @@ final class SpaceAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }

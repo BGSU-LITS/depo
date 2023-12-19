@@ -12,7 +12,7 @@ final class CsvConfig extends Config
     public string $delimiter = '~';
     public int $biblios = 1;
 
-    /** @var string[] */
+    /** @var array<string> */
     public array $columns = [
         'location',
         'status',

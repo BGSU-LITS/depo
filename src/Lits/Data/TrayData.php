@@ -27,7 +27,7 @@ final class TrayData extends DatabaseData
     public static function fromRow(
         array $row,
         Settings $settings,
-        Database $database
+        Database $database,
     ): self {
         $tray = new static($settings, $database);
 
@@ -46,19 +46,19 @@ final class TrayData extends DatabaseData
         }
 
         $tray->length = self::positiveFloat(
-            self::findRowFloat($row, 'length')
+            self::findRowFloat($row, 'length'),
         );
 
         $tray->width = self::positiveFloat(
-            self::findRowFloat($row, 'width')
+            self::findRowFloat($row, 'width'),
         );
 
         $tray->height = self::positiveFloat(
-            self::findRowFloat($row, 'height')
+            self::findRowFloat($row, 'height'),
         );
 
         $tray->per_shelf = self::positiveInt(
-            self::findRowInt($row, 'per_shelf')
+            self::findRowInt($row, 'per_shelf'),
         );
 
         $tray->level = self::findRowString($row, 'level');
@@ -112,7 +112,7 @@ final class TrayData extends DatabaseData
     {
         if (\is_null($this->per_shelf) !== \is_null($this->level)) {
             throw new InvalidDataException(
-                'Per Shelf and Level must be specified together'
+                'Per Shelf and Level must be specified together',
             );
         }
 
@@ -129,7 +129,7 @@ final class TrayData extends DatabaseData
 
         try {
             $this->database->insert('tray', $map);
-        } catch (DuplicateInsertException $exception) {
+        } catch (DuplicateInsertException) {
             $this->database->update('tray', $map, 'id', $map['id']);
         }
     }
@@ -141,7 +141,7 @@ final class TrayData extends DatabaseData
             $database->query
                 ->select()
                 ->from('tray')
-                ->orderBy('id', 'ASC')
+                ->orderBy('id', 'ASC'),
         );
 
         $result = [];

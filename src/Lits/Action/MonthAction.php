@@ -26,14 +26,14 @@ final class MonthAction extends Action
                 $this->routeCollector->getRouteParser()->urlFor(
                     'changes',
                     [],
-                    $params
-                )
+                    $params,
+                ),
             );
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }

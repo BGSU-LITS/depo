@@ -29,7 +29,7 @@ final class CreateStateTable extends AbstractMigration
                 'catalog_id',
                 'catalog',
                 'id',
-                ForeignKey::RESTRICT
+                ForeignKey::RESTRICT,
             )
             ->create();
     }

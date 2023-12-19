@@ -8,7 +8,7 @@ use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 
-class CreateSpaceTable extends AbstractMigration
+final class CreateSpaceTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
     protected function up(): void

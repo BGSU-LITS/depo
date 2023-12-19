@@ -26,10 +26,10 @@ final class ItemData extends DatabaseData
     public bool $newest = false;
     public ?string $state = null;
 
-    /** @var string[] */
+    /** @var array<string> */
     public array $barcodes = [];
 
-    /** @var string[] */
+    /** @var array<string> */
     public array $biblios = [];
 
     public ?PlaceData $place = null;
@@ -41,7 +41,7 @@ final class ItemData extends DatabaseData
     public static function fromRow(
         array $row,
         Settings $settings,
-        Database $database
+        Database $database,
     ): self {
         $item = new static($settings, $database);
 
@@ -119,7 +119,7 @@ final class ItemData extends DatabaseData
                 'newest' => $this->newest,
                 'state' => $this->state,
             ],
-            'id'
+            'id',
         );
 
         $this->database->delete('barcode', ['item_id' => $this->id]);
@@ -130,7 +130,7 @@ final class ItemData extends DatabaseData
                 [
                     'item_id' => $this->id,
                     'barcode' => $barcode,
-                ]
+                ],
             );
         }
 
@@ -142,7 +142,7 @@ final class ItemData extends DatabaseData
                 [
                     'item_id' => $this->id,
                     'biblio' => $biblio,
-                ]
+                ],
             );
         }
 
@@ -184,7 +184,7 @@ final class ItemData extends DatabaseData
 
     public static function setState(
         Settings $settings,
-        Database $database
+        Database $database,
     ): int {
         $states = StateData::all($settings, $database);
         $clauses = [];
@@ -213,11 +213,11 @@ final class ItemData extends DatabaseData
      */
     protected static function findRowDatetime(
         array $row,
-        string $key
+        string $key,
     ): ?DateTimeImmutable {
         if (isset($row[$key])) {
             try {
-                /** @var string */
+                /** @psalm-var string $date */
                 $date = preg_replace(
                     [
                         '/^(\d{2})-(\d{2})-(\d{2})$/',
@@ -227,7 +227,7 @@ final class ItemData extends DatabaseData
                         '19$3-$1-$2',
                         '$3-$1-$2',
                     ],
-                    $row[$key]
+                    $row[$key],
                 );
 
                 return new DateTimeImmutable($date);
@@ -235,7 +235,7 @@ final class ItemData extends DatabaseData
                 throw new InvalidDataException(
                     'The string could not be parsed into a datetime',
                     0,
-                    $exception
+                    $exception,
                 );
             }
         }
@@ -259,7 +259,7 @@ final class ItemData extends DatabaseData
 
     /**
      * @param array<string, string|null> $row
-     * @return string[]
+     * @return array<string>
      */
     private static function findRowList(array $row, string $key): array
     {

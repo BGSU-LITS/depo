@@ -21,7 +21,7 @@ final class ItemStateCommand extends DatabaseCommand
 
         Command::output(
             'Updated ' . \number_format($rows) .
-            ' total rows' . \PHP_EOL
+            ' total rows' . \PHP_EOL,
         );
     }
 }

@@ -23,7 +23,7 @@ final class StateData extends DatabaseData
     public static function fromRow(
         array $row,
         Settings $settings,
-        Database $database
+        Database $database,
     ): self {
         $state = new static($settings, $database);
 
@@ -87,7 +87,7 @@ final class StateData extends DatabaseData
         ]);
     }
 
-    /** @return self[] */
+    /** @return array<self> */
     public static function all(Settings $settings, Database $database): array
     {
         $statement = $database->execute(
@@ -95,7 +95,7 @@ final class StateData extends DatabaseData
                 ->select()
                 ->from('state')
                 ->orderBy('catalog_id', 'ASC')
-                ->orderBy('state', 'ASC')
+                ->orderBy('state', 'ASC'),
         );
 
         $result = [];

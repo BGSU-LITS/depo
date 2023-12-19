@@ -41,8 +41,8 @@ final class ItemsAction extends AuthDatabaseAction
                 $this->redirect(
                     $this->routeCollector->getRouteParser()->urlFor(
                         'items',
-                        ['barcode' => $barcode]
-                    )
+                        ['barcode' => $barcode],
+                    ),
                 );
 
                 return;
@@ -53,7 +53,7 @@ final class ItemsAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
@@ -69,25 +69,25 @@ final class ItemsAction extends AuthDatabaseAction
 
         if ($place->section !== '00') {
             $select = $select->andWhere(
-                field('place.section')->eq($place->section)
+                field('place.section')->eq($place->section),
             );
         }
 
         if ($place->shelf !== '00') {
             $select = $select->andWhere(
-                field('place.shelf')->eq($place->shelf)
+                field('place.shelf')->eq($place->shelf),
             );
         }
 
         if ($place->tray !== '00') {
             $select = $select->andWhere(
-                field('place.tray')->eq($place->tray)
+                field('place.tray')->eq($place->tray),
             );
         }
 
         if ($place->item !== '00') {
             $select = $select->andWhere(
-                field('place.item')->eq($place->item)
+                field('place.item')->eq($place->item),
             );
         }
 
@@ -101,7 +101,7 @@ final class ItemsAction extends AuthDatabaseAction
             $place = PlaceData::fromBarcode(
                 \str_pad($this->data['barcode'], 12, '0'),
                 $this->settings,
-                $this->database
+                $this->database,
             );
 
             if (
@@ -114,7 +114,7 @@ final class ItemsAction extends AuthDatabaseAction
         }
 
         throw new InvalidDataException(
-            'A partial barcode must be specified including module and side'
+            'A partial barcode must be specified including module and side',
         );
     }
 }

@@ -9,18 +9,18 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^8.2",
         "ext-PDO": "*",
         "ext-date": "*",
-        "bgsu-lits/framework": "^1.10.0",
-        "bgsu-lits/framework-auth": "^1.5.0",
-        "bgsu-lits/framework-database": "^1.2.5",
+        "bgsu-lits/framework": "^2.0",
+        "bgsu-lits/framework-auth": "^2.0",
+        "bgsu-lits/framework-database": "^2.0",
         "latitude/latitude": "^4.2",
         "league/csv": "^9.7",
-        "lulco/phoenix": "^1.10",
+        "lulco/phoenix": "^2.5",
         "slim/http": "^1.1",
         "slim/slim": "^4.2",
-        "thecodingmachine/safe": "^1.0",
+        "thecodingmachine/safe": "^2.5",
         "ulrichsg/getopt-php": "^4.0"
     },
     "require-dev": {
@@ -28,10 +28,6 @@
         "neronmoon/scriptsdev": "^0.1.9",
         "phpunit/phpunit": "^9",
         "roave/security-advisories": "dev-master"
-    },
-    "replace": {
-        "ext-sodium": "*",
-        "ext-zip": "*"
     },
     "autoload": {
         "psr-4": {
@@ -56,7 +52,7 @@
         "scripts-dev": {
             "phpcbf": "phpcbf ./ --standard=phpcs.xml",
             "phpcs": "phpcs ./ --standard=phpcs.xml",
-            "phplint": "phplint ./ --exclude=vendor",
+            "phplint": "phplint ./ -c phplint.yml",
             "phpstan": "phpstan analyse -c phpstan.neon",
             "phpunit": "phpunit -c phpunit.xml",
             "psalm": "psalm --config=psalm.xml",

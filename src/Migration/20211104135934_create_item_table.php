@@ -25,13 +25,13 @@ final class CreateItemTable extends AbstractMigration
             ->addColumn('message', 'string', ['length' => 1, 'null' => true])
             ->addIndex(
                 ['catalog_id', 'record', 'created', 'updated'],
-                Index::TYPE_UNIQUE
+                Index::TYPE_UNIQUE,
             )
             ->addForeignKey(
                 'catalog_id',
                 'catalog',
                 'id',
-                ForeignKey::RESTRICT
+                ForeignKey::RESTRICT,
             )
             ->create();
     }

@@ -7,7 +7,7 @@ namespace Migration;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 
-class AddModuleSideSectionShelfIndexToPlace extends AbstractMigration
+final class AddModuleSideSectionShelfIndexToPlace extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
     protected function up(): void

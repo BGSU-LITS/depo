@@ -76,7 +76,7 @@ final class SpaceUpdateCommand extends DatabaseCommand
 
         Command::output(
             'Inserted ' . \number_format($rows) .
-            ' total rows' . \PHP_EOL
+            ' total rows' . \PHP_EOL,
         );
     }
 }

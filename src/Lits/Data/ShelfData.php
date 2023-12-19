@@ -18,13 +18,13 @@ final class ShelfData extends DatabaseData
     public ?string $tray_id = null;
 
     /**
-     * @param mixed[] $row
+     * @param array<mixed> $row
      * @throws InvalidDataException
      */
     public static function fromRow(
         array $row,
         Settings $settings,
-        Database $database
+        Database $database,
     ): self {
         $shelf = new static($settings, $database);
 
@@ -71,7 +71,7 @@ final class ShelfData extends DatabaseData
     }
 
     /**
-     * @param mixed[] $row
+     * @param array<mixed> $row
      * @throws InvalidDataException
      */
     public static function checkString(array $row, string $key): string
@@ -82,7 +82,7 @@ final class ShelfData extends DatabaseData
             $row[$key] === ''
         ) {
             throw new InvalidDataException(
-                'The ' . $key . ' must be specified'
+                'The ' . $key . ' must be specified',
             );
         }
 

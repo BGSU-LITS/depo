@@ -27,7 +27,7 @@ final class TraySpaceAction extends AuthDatabaseAction
         if (!isset($this->data['tray'])) {
             throw new HttpBadRequestException(
                 $this->request,
-                'Tray ID must be specified'
+                'Tray ID must be specified',
             );
         }
 
@@ -40,18 +40,18 @@ final class TraySpaceAction extends AuthDatabaseAction
             $context['space'] = SpaceData::fromTrayId(
                 $this->data['tray'],
                 $this->settings,
-                $this->database
+                $this->database,
             );
 
             $context['modules'] = $this->modules(
                 $context['space'],
-                $context['status']
+                $context['status'],
             );
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(
                 $this->request,
                 'Could not find most recent update',
-                $exception
+                $exception,
             );
         }
 
@@ -61,13 +61,13 @@ final class TraySpaceAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
 
     /**
-     * @return string[][][][]
+     * @return array<array<array<array<string>>>>
      * @throws DatetimeException
      */
     private function modules(SpaceData $space, ?string $status): array
@@ -77,12 +77,12 @@ final class TraySpaceAction extends AuthDatabaseAction
                 ->select('*')
                 ->from('space')
                 ->where(field('updated')->eq(
-                    $space->updated->format('Y-m-d')
+                    $space->updated->format('Y-m-d'),
                 ))
                 ->orderBy('module', 'ASC')
                 ->orderBy('side', 'ASC')
                 ->orderBy('shelf', 'ASC')
-                ->orderBy('section', 'ASC')
+                ->orderBy('section', 'ASC'),
         );
 
         $result = [];
@@ -93,13 +93,13 @@ final class TraySpaceAction extends AuthDatabaseAction
             $shelf = ShelfData::fromRow(
                 $row,
                 $this->settings,
-                $this->database
+                $this->database,
             );
 
             $used = isset($row['used']) ? (int) $row['used'] : 0;
             $count = self::count($space, $shelf, $used, $status);
 
-            // phpcs:disable Squiz.Arrays.ArrayBracketSpacing
+            // phpcs:disable
             $result
                 [$shelf->module]
                 [$shelf->side]
@@ -119,7 +119,7 @@ final class TraySpaceAction extends AuthDatabaseAction
         SpaceData $space,
         ShelfData $shelf,
         int $used,
-        ?string $status
+        ?string $status,
     ): string {
         if ($shelf->tray_id !== $space->tray->id) {
             return '';
@@ -146,9 +146,9 @@ final class TraySpaceAction extends AuthDatabaseAction
     }
 
     /**
-     * @param string[][][][] $result
-     * @param bool[][] $modules
-     * @return string[][][][]
+     * @param array<array<array<array<string>>>> $result
+     * @param array<array<bool>> $modules
+     * @return array<array<array<array<string>>>>
      */
     private static function filterModules(array $result, array $modules): array
     {

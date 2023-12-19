@@ -27,7 +27,7 @@ final class MissingShelvesAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
@@ -40,7 +40,7 @@ final class MissingShelvesAction extends AuthDatabaseAction
                 on('place.module', 'shelf.module')
                     ->and(on('place.side', 'shelf.side'))
                     ->and(on('place.section', 'shelf.section'))
-                    ->and(on('place.shelf', 'shelf.shelf'))
+                    ->and(on('place.shelf', 'shelf.shelf')),
             )
             ->where(field('shelf.tray_id')->isNull());
     }

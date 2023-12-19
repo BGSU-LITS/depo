@@ -6,6 +6,7 @@ namespace Lits\Data;
 
 use League\Csv\Exception as CsvException;
 use League\Csv\Reader;
+use League\Csv\UnavailableStream;
 use Lits\Command;
 use Lits\Config\CsvConfig;
 use Lits\Exception\InvalidConfigException;
@@ -17,13 +18,16 @@ final class CsvData extends DatabaseData
     /** @var list<ItemData> */
     public array $items = [];
 
-    /** @var string[] */
+    /** @var array<string> */
     private array $columns;
 
     private int $biblios;
     private string $biblios_column;
 
-    /** @throws InvalidConfigException */
+    /**
+     * @throws InvalidConfigException
+     * @throws InvalidDataException
+     */
     public function load(string $catalog, string $file): void
     {
         $csv = $this->csvReader($file);
@@ -32,34 +36,53 @@ final class CsvData extends DatabaseData
 
         $item_count = 0;
 
-        /** @var array<string, ?string> $row */
-        foreach ($csv->getRecords($this->columns) as $row) {
-            Command::output('Saving row #' . \number_format($item_count));
-            $item_count++;
+        try {
+            /** @var array<string, ?string> $row */
+            foreach ($csv->getRecords($this->columns) as $row) {
+                Command::output('Saving row #' . \number_format($item_count));
+                $item_count++;
 
-            try {
-                $this->saveItem($catalog, $row);
-            } catch (InvalidDataException | \PDOException $exception) {
-                Command::output(\PHP_EOL . (string) $exception . \PHP_EOL);
+                try {
+                    $this->saveItem($catalog, $row);
+                } catch (InvalidDataException | \PDOException $exception) {
+                    Command::output(\PHP_EOL . (string) $exception . \PHP_EOL);
 
-                continue;
+                    continue;
+                }
+
+                Command::output("\r");
             }
-
-            Command::output("\r");
+        } catch (CsvException $exception) {
+            throw new InvalidDataException(
+                'The CSV file could not be read',
+                0,
+                $exception,
+            );
         }
 
         Command::output(
             'Saved ' . \number_format($item_count) .
-            ' total rows' . \PHP_EOL
+            ' total rows' . \PHP_EOL,
         );
     }
 
-    /** @throws InvalidConfigException */
+    /**
+     * @throws InvalidConfigException
+     * @throws InvalidDataException
+     */
     private function csvReader(string $file): Reader
     {
         \assert($this->settings['csv'] instanceof CsvConfig);
 
-        $csv = Reader::createFromPath($file);
+        try {
+            $csv = Reader::createFromPath($file);
+        } catch (UnavailableStream $exception) {
+            throw new InvalidDataException(
+                'The CSV file could not be read',
+                0,
+                $exception,
+            );
+        }
 
         try {
             $csv->setDelimiter($this->settings['csv']->delimiter);
@@ -67,7 +90,7 @@ final class CsvData extends DatabaseData
             throw new InvalidConfigException(
                 'The CSV delimiter setting is invalid',
                 0,
-                $exception
+                $exception,
             );
         }
 
@@ -78,7 +101,7 @@ final class CsvData extends DatabaseData
                 throw new InvalidConfigException(
                     'The CSV header setting is invalid',
                     0,
-                    $exception
+                    $exception,
                 );
             }
         }
@@ -97,7 +120,7 @@ final class CsvData extends DatabaseData
         $item = ItemData::fromRow(
             $row,
             $this->settings,
-            $this->database
+            $this->database,
         );
 
         $item->catalog_id = $catalog;
@@ -124,7 +147,7 @@ final class CsvData extends DatabaseData
 
         if (!\is_string($biblios_column)) {
             throw new InvalidConfigException(
-                'The CSV columns setting is invalid'
+                'The CSV columns setting is invalid',
             );
         }
 

@@ -29,7 +29,7 @@ final class TraysAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
@@ -41,11 +41,11 @@ final class TraysAction extends AuthDatabaseAction
     public function post(
         ServerRequest $request,
         Response $response,
-        array $data
+        array $data,
     ): Response {
         $this->setup($request, $response, $data);
 
-        /** @var array<string, string|null>|null */
+        /** @var array<string, string|null>|null $post */
         $post = $this->request->getParsedBody();
 
         if (!\is_array($post)) {
@@ -54,13 +54,13 @@ final class TraysAction extends AuthDatabaseAction
 
         try {
             $this->redirect(
-                $this->routeCollector->getRouteParser()->urlFor('trays')
+                $this->routeCollector->getRouteParser()->urlFor('trays'),
             );
 
             $tray = TrayData::fromRow(
                 $post,
                 $this->settings,
-                $this->database
+                $this->database,
             );
 
             if (isset($post['remove'])) {
@@ -68,26 +68,26 @@ final class TraysAction extends AuthDatabaseAction
 
                 $this->message(
                     'success',
-                    'Removed Tray Type ' . $tray->id
+                    'Removed Tray Type ' . $tray->id,
                 );
             } else {
                 $tray->save();
 
                 $this->message(
                     'success',
-                    'Updated Tray Type ' . $tray->id
+                    'Updated Tray Type ' . $tray->id,
                 );
             }
         } catch (InvalidDataException $exception) {
             $this->message(
                 'failure',
-                \rtrim($exception->getMessage(), '.') . '.'
+                \rtrim($exception->getMessage(), '.') . '.',
             );
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
 

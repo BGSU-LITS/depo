@@ -28,7 +28,7 @@ final class CatalogsAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
@@ -40,11 +40,11 @@ final class CatalogsAction extends AuthDatabaseAction
     public function post(
         ServerRequest $request,
         Response $response,
-        array $data
+        array $data,
     ): Response {
         $this->setup($request, $response, $data);
 
-        /** @var array<string, string|null>|null */
+        /** @var array<string, string|null>|null $post */
         $post = $this->request->getParsedBody();
 
         if (!\is_array($post)) {
@@ -55,7 +55,7 @@ final class CatalogsAction extends AuthDatabaseAction
             $catalog = CatalogData::fromRow(
                 $post,
                 $this->settings,
-                $this->database
+                $this->database,
             );
 
             if (isset($post['remove'])) {
@@ -63,25 +63,25 @@ final class CatalogsAction extends AuthDatabaseAction
 
                 $this->message(
                     'success',
-                    'Removed Catalog ' . $catalog->id
+                    'Removed Catalog ' . $catalog->id,
                 );
             } else {
                 $catalog->save();
 
                 $this->message(
                     'success',
-                    'Updated Catalog ' . $catalog->id
+                    'Updated Catalog ' . $catalog->id,
                 );
             }
 
             $this->redirect(
-                $this->routeCollector->getRouteParser()->urlFor('catalogs')
+                $this->routeCollector->getRouteParser()->urlFor('catalogs'),
             );
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
 

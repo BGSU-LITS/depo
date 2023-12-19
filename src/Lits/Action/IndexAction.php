@@ -21,20 +21,20 @@ final class IndexAction extends AuthDatabaseAction
         $statement = $this->database->execute(
             $this->database->query
                 ->select(func('MAX', 'updated'))
-                ->from('item')
+                ->from('item'),
         );
 
         $route = RouteContext::fromRequest($this->request)->getRoute();
 
         $context = [
-            'iframe' => $route->getName() === 'iframe',
+            'iframe' => !\is_null($route) && $route->getName() === 'iframe',
             'updated' => $statement->fetchColumn(),
             'total' => null,
             'total_location' => $this->total(),
             'total_catalog' => [],
             'catalogs' => CatalogData::all(
                 $this->settings,
-                $this->database
+                $this->database,
             ),
         ];
 
@@ -50,7 +50,7 @@ final class IndexAction extends AuthDatabaseAction
             throw new HttpInternalServerErrorException(
                 $this->request,
                 null,
-                $exception
+                $exception,
             );
         }
     }
@@ -63,17 +63,17 @@ final class IndexAction extends AuthDatabaseAction
                 ->select(
                     'catalog_id',
                     'location',
-                    alias(func('COUNT', '*'), 'total')
+                    alias(func('COUNT', '*'), 'total'),
                 )
                 ->from('item')
                 ->where(
                     field('newest')->eq(true)->and(
                         group(field('state')->isNull()->or(
-                            field('state')->notEq('deaccession')
-                        ))
-                    )
+                            field('state')->notEq('deaccession'),
+                        )),
+                    ),
                 )
-                ->groupBy('catalog_id', 'location')
+                ->groupBy('catalog_id', 'location'),
         );
 
         $total = [];
