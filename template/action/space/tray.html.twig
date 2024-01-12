@@ -59,17 +59,20 @@ Whole shelves
             <th colspan="{{ modules[module][side]|length }}">Sections</th>
         </tr>
         <tr>
+{% set shelves = [] %}
 {% for section in modules[module][side]|keys %}
+{% set current = modules[module][side][section]|keys %}
+{% set shelves = shelves|length > current|length ? shelves : current %}
             <th><a href="{{ url_for('items', {'barcode': '8' ~ module ~ side ~ section}) }}" data-section="{{ section }}" title="Section {{ section }}">{{ section }}</a></th>
 {% endfor %}
             <th></th>
         </tr>
     </thead>
     <tbody>
-{% for shelf in modules[module][side]|first|keys %}
+{% for shelf in shelves %}
         <tr>
 {% if loop.first %}
-            <th rowspan="{{ modules[module][side]|first|length }}"><span class="bgsu_common__rotate">Shelves</span></th>
+            <th rowspan="{{ shelves|length }}"><span class="bgsu_common__rotate">Shelves</span></th>
 {% endif %}
             <th><a href="{{ url_for('items', {'barcode': '8' ~ module ~ side ~ '00' ~ shelf}) }}" data-shelf="{{ shelf }}" title="Shelf {{ shelf }}">{{ shelf }}</a></th>
 {% for section in modules[module][side]|keys %}
