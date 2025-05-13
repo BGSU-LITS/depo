@@ -11,27 +11,18 @@ bgsu_chart.setup(
         type: 'doughnut',
         data: {
             labels: [
-                '{{ catalogs['bgsu'].name }} Local',
-                '{{ catalogs['bgsu'].name }} OHDEP',
-                '{{ catalogs['ut'].name }}  Local',
-                '{{ catalogs['ut'].name }} OHDEP',
-                '{{ catalogs['ohdep'].name }} Keeper Copies',
+                '{{ catalogs['bgsu'].name }}',
+                '{{ catalogs['ut'].name }}',
             ],
             datasets: [
                 {
                     backgroundColor: [
                         '{{ catalogs['bgsu'].color1 }}',
-                        '{{ catalogs['bgsu'].color2 }}',
                         '{{ catalogs['ut'].color1 }}',
-                        '{{ catalogs['ut'].color2 }}',
-                        '{{ catalogs['ohdep'].color1 }}',
                     ],
                     data: [
                         {{ total_catalog['bgsu'] }},
-                        {{ total_location['ohdep']['odnw1'] }},
                         {{ total_catalog['ut'] }},
-                        {{ total_location['ohdep']['odnw2'] }},
-                        {{ total_location['ohdep']['odnw3'] + total_location['ohdep']['odnwd'] }},
                     ],
                     tooltip: {
                         callbacks: {
@@ -88,41 +79,21 @@ bgsu_chart.setup(
 <table class="bgsu_common_table">
 <tbody>
 <tr>
-    <th rowspan="2">{{ catalogs['bgsu'].name }}</th>
-    <th>Local</th>
+    <th>{{ catalogs['bgsu'].name }}</th>
     <td class="bgsu_common__figure">{{ total_catalog['bgsu']|number_format }}</td>
     <td class="bgsu_common__figure">{{ (total_catalog['bgsu'] / total * 100)|round(1) }}%</td>
     <td style="background:{{ catalogs['bgsu'].color1 }}">&nbsp;</td>
 </tr>
 <tr>
-    <th>OHDEP</th>
-    <td class="bgsu_common__figure">{{ total_location['ohdep']['odnw1']|number_format }}</td>
-    <td class="bgsu_common__figure">{{ (total_location['ohdep']['odnw1'] / total * 100)|round(1) }}%</td>
-    <td style="background:{{ catalogs['bgsu'].color2 }}">&nbsp;</td>
-</tr>
-<tr>
-    <th rowspan="2">{{ catalogs['ut'].name }}</th>
-    <th>Local</th>
+    <th>{{ catalogs['ut'].name }}</th>
     <td class="bgsu_common__figure">{{ total_catalog['ut']|number_format }}</td>
     <td class="bgsu_common__figure">{{ (total_catalog['ut'] / total * 100)|round(1) }}%</td>
     <td style="background:{{ catalogs['ut'].color1 }}">&nbsp;</td>
 </tr>
-<tr>
-    <th>OHDEP</th>
-    <td class="bgsu_common__figure">{{ total_location['ohdep']['odnw2']|number_format }}</td>
-    <td class="bgsu_common__figure">{{ (total_location['ohdep']['odnw2'] / total * 100)|round(1) }}%</td>
-    <td style="background:{{ catalogs['ut'].color2 }}">&nbsp;</td>
-</tr>
-<tr>
-    <th colspan="2">{{ catalogs['ohdep'].name }} Keeper Copies</th>
-    <td class="bgsu_common__figure">{{ (total_location['ohdep']['odnw3'] + total_location['ohdep']['odnwd'])|number_format }}</td>
-    <td class="bgsu_common__figure">{{ ((total_location['ohdep']['odnw3'] + total_location['ohdep']['odnwd']) / total * 100)|round(1) }}%</td>
-    <td style="background:{{ catalogs['ohdep'].color1 }}">&nbsp;</td>
-</tr>
 </tbody>
 <tfoot>
 <tr>
-    <th colspan="2">Total</th>
+    <th>Total</th>
     <td class="bgsu_common__figure">{{ total|number_format }}</td>
     <td class="bgsu_common__figure">100%</td>
 </tr>

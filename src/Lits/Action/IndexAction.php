@@ -67,11 +67,12 @@ final class IndexAction extends AuthDatabaseAction
                 )
                 ->from('item')
                 ->where(
-                    field('newest')->eq(true)->and(
-                        group(field('state')->isNull()->or(
-                            field('state')->notEq('deaccession'),
-                        )),
-                    ),
+                    field('newest')->eq(true)
+                    ->and(group(
+                        field('state')->isNull()
+                            ->or(field('state')->notEq('deaccession')),
+                    ))
+                    ->and(field('catalog_id')->notEq('ohdep')),
                 )
                 ->groupBy('catalog_id', 'location'),
         );
