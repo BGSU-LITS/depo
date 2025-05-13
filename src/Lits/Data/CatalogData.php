@@ -64,10 +64,7 @@ final class CatalogData extends DatabaseData
         $this->database->delete('catalog', ['id' => $this->id]);
     }
 
-    /**
-     * @throws \PDOException
-     * @throws DuplicateInsertException
-     */
+    /** @throws \PDOException */
     public function save(): void
     {
         try {

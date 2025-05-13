@@ -11,6 +11,7 @@ use Phoenix\Migration\AbstractMigration;
 final class DropTrayIdFieldFromPlaceTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('place')
@@ -20,6 +21,7 @@ final class DropTrayIdFieldFromPlaceTable extends AbstractMigration
     }
 
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function down(): void
     {
         $this->table('place')

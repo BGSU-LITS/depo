@@ -13,6 +13,7 @@ use Lits\Exception\InvalidConfigException;
 use Lits\Exception\InvalidDataException;
 use Safe\Exceptions\DatetimeException;
 
+/* @tempalte TValue array<string, ?string> */
 final class CsvData extends DatabaseData
 {
     /** @var list<ItemData> */
@@ -37,7 +38,6 @@ final class CsvData extends DatabaseData
         $item_count = 0;
 
         try {
-            /** @var array<string, ?string> $row */
             foreach ($csv->getRecords($this->columns) as $row) {
                 Command::output('Saving row #' . \number_format($item_count));
                 $item_count++;
@@ -69,12 +69,14 @@ final class CsvData extends DatabaseData
     /**
      * @throws InvalidConfigException
      * @throws InvalidDataException
+     * @return Reader<array<string, ?string>>
      */
     private function csvReader(string $file): Reader
     {
         \assert($this->settings['csv'] instanceof CsvConfig);
 
         try {
+            /** @var Reader<array<string, ?string>> $csv */
             $csv = Reader::createFromPath($file);
         } catch (UnavailableStream $exception) {
             throw new InvalidDataException(

@@ -10,6 +10,7 @@ use Phoenix\Migration\AbstractMigration;
 final class AddColorFieldsToCatalogTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('catalog')
@@ -18,6 +19,7 @@ final class AddColorFieldsToCatalogTable extends AbstractMigration
             ->save();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('catalog')

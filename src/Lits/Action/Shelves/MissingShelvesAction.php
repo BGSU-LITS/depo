@@ -19,6 +19,7 @@ final class MissingShelvesAction extends AuthDatabaseAction
     use ItemsTrait;
 
     /** @throws HttpInternalServerErrorException */
+    #[\Override]
     public function action(): void
     {
         try {

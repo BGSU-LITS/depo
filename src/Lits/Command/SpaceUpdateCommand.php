@@ -14,6 +14,7 @@ final class SpaceUpdateCommand extends DatabaseCommand
      * @throws FailedCommandException
      * @throws InvalidConfigException
      */
+    #[\Override]
     public function command(): void
     {
         $rows = (int) $this->database->pdo->exec('

@@ -15,6 +15,7 @@ final class ItemStateCommand extends DatabaseCommand
      * @throws FailedCommandException
      * @throws InvalidConfigException
      */
+    #[\Override]
     public function command(): void
     {
         $rows = ItemData::setState($this->settings, $this->database);

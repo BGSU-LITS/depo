@@ -24,6 +24,7 @@ final class ChangesAction extends AuthDatabaseAction
      * @throws HttpInternalServerErrorException
      * @throws HttpBadRequestException
      */
+    #[\Override]
     public function action(): void
     {
         $context = $this->context();

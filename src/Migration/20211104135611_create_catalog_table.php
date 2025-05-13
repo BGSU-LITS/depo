@@ -10,6 +10,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreateCatalogTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('catalog', 'id')
@@ -19,6 +20,7 @@ final class CreateCatalogTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('catalog')->drop();

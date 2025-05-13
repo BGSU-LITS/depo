@@ -38,6 +38,7 @@ trait ItemsTrait
 
     /**
      * @return array<string, mixed>
+     * @throws HttpInternalServerErrorException
      * @throws InvalidDataException
      */
     protected function context(): array
@@ -50,13 +51,21 @@ trait ItemsTrait
             'table_headers' => $this->table_headers,
         ];
 
-        $context['pagination']->setNormalizeOutOfRangePages(true);
-        $context['pagination']->setMaxPerPage(20);
-
         $page = (int) $this->request->getQueryParam('page', 1);
 
-        if ($page > 0) {
-            $context['pagination']->setCurrentPage($page);
+        try {
+            $context['pagination']->setNormalizeOutOfRangePages(true);
+            $context['pagination']->setMaxPerPage(20);
+
+            if ($page > 0) {
+                $context['pagination']->setCurrentPage($page);
+            }
+        } catch (\Throwable $exception) {
+            throw new HttpInternalServerErrorException(
+                $this->request,
+                'Invalid page range specified',
+                $exception,
+            );
         }
 
         return $context;
@@ -70,8 +79,6 @@ trait ItemsTrait
     {
         try {
             $statement = $this->database->execute($this->select());
-
-            /** @var array<array<mixed>>|false $rows */
             $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Throwable $exception) {
             throw new HttpInternalServerErrorException(
@@ -81,7 +88,7 @@ trait ItemsTrait
             );
         }
 
-        if ($rows === false) {
+        if ($rows === []) {
             throw new HttpInternalServerErrorException(
                 $this->request,
                 'Could not fetch data from database',

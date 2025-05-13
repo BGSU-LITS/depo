@@ -8,7 +8,6 @@ use Lits\Data\SpaceData;
 use Lits\Data\TrayData;
 use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpInternalServerErrorException;
-use Slim\Exception\HttpNotFoundException;
 
 final class SpaceAction extends AuthDatabaseAction
 {
@@ -17,8 +16,8 @@ final class SpaceAction extends AuthDatabaseAction
     /**
      * @throws HttpBadRequestException
      * @throws HttpInternalServerErrorException
-     * @throws HttpNotFoundException
      */
+    #[\Override]
     public function action(): void
     {
         $context = $this->dateContext('space');
@@ -34,17 +33,17 @@ final class SpaceAction extends AuthDatabaseAction
                 'usedSpace' => \array_reduce(
                     $context['spaces'],
                     fn (?float $total, SpaceData $space): float =>
-                        (float) $total + (float) $space->usedSpace()
+                        (float) $total + (float) $space->usedSpace(),
                 ),
                 'freeSpace' => \array_reduce(
                     $context['spaces'],
                     fn (?float $total, SpaceData $space): float =>
-                        (float) $total + (float) $space->freeSpace()
+                        (float) $total + (float) $space->freeSpace(),
                 ),
                 'totalSpace' => \array_reduce(
                     $context['spaces'],
                     fn (?float $total, SpaceData $space): float =>
-                        (float) $total + (float) $space->totalSpace()
+                        (float) $total + (float) $space->totalSpace(),
                 ),
             ];
 

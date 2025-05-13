@@ -15,6 +15,7 @@ final class ItemNewestCommand extends DatabaseCommand
      * @throws FailedCommandException
      * @throws InvalidConfigException
      */
+    #[\Override]
     public function command(): void
     {
         $rows = ItemData::setNewest($this->database);

@@ -10,6 +10,7 @@ use Phoenix\Migration\AbstractMigration;
 final class AddLevelFieldToTrayTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('tray')
@@ -21,6 +22,7 @@ final class AddLevelFieldToTrayTable extends AbstractMigration
             ->save();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('tray')

@@ -16,6 +16,7 @@ use function Latitude\QueryBuilder\group;
 final class IndexAction extends AuthDatabaseAction
 {
     /** @throws HttpInternalServerErrorException */
+    #[\Override]
     public function action(): void
     {
         $statement = $this->database->execute(

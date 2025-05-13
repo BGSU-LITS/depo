@@ -38,7 +38,7 @@ return function (Framework $framework): void {
         ->setName('catalogs');
 
     $framework->app()
-        ->post('/catalogs', [CatalogsAction::class, 'post'])
+        ->post('/catalogs', CatalogsAction::class . ':post')
         ->setArgument('auth', 'admin');
 
     $framework->app()
@@ -49,6 +49,7 @@ return function (Framework $framework): void {
         ->get('/items[/{barcode}]', ItemsAction::class)
         ->setName('items');
 
+    /** @psalm-suppress InvalidArgument */
     ItemsAction::addFileRoutes($framework->app(), '/items/{barcode}');
 
     $framework->app()
@@ -58,6 +59,7 @@ return function (Framework $framework): void {
         ->get('/shelves/missing', MissingShelvesAction::class)
         ->setName('shelves/missing');
 
+    /** @psalm-suppress InvalidArgument */
     MissingShelvesAction::addFileRoutes($framework->app(), 'shelves/missing');
 
     $framework->app()
@@ -65,7 +67,7 @@ return function (Framework $framework): void {
         ->setName('shelves');
 
     $framework->app()
-        ->post('/shelves', [ShelvesAction::class, 'post'])
+        ->post('/shelves', ShelvesAction::class . ':post')
         ->setArgument('auth', 'admin');
 
     $framework->app()
@@ -81,6 +83,6 @@ return function (Framework $framework): void {
         ->setName('trays');
 
     $framework->app()
-        ->post('/trays', [TraysAction::class, 'post'])
+        ->post('/trays', TraysAction::class . ':post')
         ->setArgument('auth', 'admin');
 };

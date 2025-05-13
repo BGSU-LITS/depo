@@ -17,6 +17,7 @@ final class TraysAction extends AuthDatabaseAction
      * @throws HttpInternalServerErrorException
      * @throws HttpNotFoundException
      */
+    #[\Override]
     public function action(): void
     {
         $context = [

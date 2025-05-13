@@ -11,6 +11,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreatePlaceTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('place', 'item_id')
@@ -27,6 +28,7 @@ final class CreatePlaceTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('place')->drop();

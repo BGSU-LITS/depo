@@ -211,6 +211,7 @@ final class ItemData extends DatabaseData
      * @param array<string, string|null> $row
      * @throws InvalidDataException
      */
+    #[\Override]
     protected static function findRowDatetime(
         array $row,
         string $key,

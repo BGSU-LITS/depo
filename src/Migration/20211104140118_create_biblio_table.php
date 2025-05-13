@@ -11,6 +11,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreateBiblioTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('biblio', ['item_id', 'biblio'])
@@ -20,6 +21,7 @@ final class CreateBiblioTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('biblio')->drop();

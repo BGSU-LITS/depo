@@ -11,6 +11,7 @@ use Phoenix\Migration\AbstractMigration;
 final class AddStateFieldToItemTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('item')
@@ -29,6 +30,7 @@ final class AddStateFieldToItemTable extends AbstractMigration
             ->save();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('item')

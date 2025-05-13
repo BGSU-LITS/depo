@@ -17,6 +17,7 @@ final class ProcessCommand extends DatabaseCommand
      * @throws InvalidConfigException
      * @throws InvalidDataException
      */
+    #[\Override]
     public function command(): void
     {
         $statement = $this->database->execute(
@@ -26,10 +27,9 @@ final class ProcessCommand extends DatabaseCommand
                 ->orderBy('id', 'asc'),
         );
 
-        /** @var array<string>|false $options */
         $options = $statement->fetchAll(\PDO::FETCH_COLUMN, 0);
 
-        if ($options === false || $options === []) {
+        if ($options === []) {
             throw new FailedCommandException(
                 'Catalog source options could not be retrieved',
             );
@@ -44,7 +44,7 @@ final class ProcessCommand extends DatabaseCommand
                     fn (string $value) => \in_array($value, $options, true),
                     'Operand catalog must be ' .
                     \implode(', ', \array_slice($options, 0, -1)) . ' or ' .
-                    \end($options),
+                    (string) \end($options),
                 ),
         );
 

@@ -11,6 +11,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreateStateTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('state', ['catalog_id', 'state'])
@@ -34,6 +35,7 @@ final class CreateStateTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('state')->drop();

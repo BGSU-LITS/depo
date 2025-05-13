@@ -22,6 +22,7 @@ final class TraySpaceAction extends AuthDatabaseAction
      * @throws HttpInternalServerErrorException
      * @throws HttpNotFoundException
      */
+    #[\Override]
     public function action(): void
     {
         if (!isset($this->data['tray'])) {

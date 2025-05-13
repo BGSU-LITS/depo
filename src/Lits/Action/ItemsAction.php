@@ -17,6 +17,7 @@ final class ItemsAction extends AuthDatabaseAction
     use ItemsTrait;
 
     /** @throws HttpInternalServerErrorException */
+    #[\Override]
     public function action(): void
     {
         $context = [];

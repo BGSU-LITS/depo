@@ -11,6 +11,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreateBarcodeTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('barcode', ['item_id', 'barcode'])
@@ -20,6 +21,7 @@ final class CreateBarcodeTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('barcode')->drop();

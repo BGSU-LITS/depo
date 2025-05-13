@@ -10,6 +10,7 @@ use Phoenix\Migration\AbstractMigration;
 final class DropTotalFieldFromTrayTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('tray')
@@ -18,6 +19,7 @@ final class DropTotalFieldFromTrayTable extends AbstractMigration
     }
 
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function down(): void
     {
         $this->table('tray')

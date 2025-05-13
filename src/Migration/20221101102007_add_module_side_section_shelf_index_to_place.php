@@ -10,6 +10,7 @@ use Phoenix\Migration\AbstractMigration;
 final class AddModuleSideSectionShelfIndexToPlace extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('place')
@@ -17,6 +18,7 @@ final class AddModuleSideSectionShelfIndexToPlace extends AbstractMigration
             ->save();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('place')

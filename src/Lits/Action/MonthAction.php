@@ -10,6 +10,7 @@ use Slim\Exception\HttpInternalServerErrorException;
 final class MonthAction extends Action
 {
     /** @throws HttpInternalServerErrorException */
+    #[\Override]
     public function action(): void
     {
         $params = [];

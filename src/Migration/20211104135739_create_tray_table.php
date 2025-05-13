@@ -10,6 +10,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreateTrayTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('tray', 'id')
@@ -24,6 +25,7 @@ final class CreateTrayTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('tray')->drop();

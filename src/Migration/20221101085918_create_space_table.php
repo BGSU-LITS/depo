@@ -11,6 +11,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreateSpaceTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $primary = ['module', 'side', 'section', 'shelf', 'updated'];
@@ -27,6 +28,7 @@ final class CreateSpaceTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('space')->drop();

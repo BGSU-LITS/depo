@@ -11,6 +11,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreateShelfTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('shelf', ['module', 'side', 'section', 'shelf'])
@@ -23,6 +24,7 @@ final class CreateShelfTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('shelf')->drop();

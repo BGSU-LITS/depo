@@ -12,6 +12,7 @@ use Phoenix\Migration\AbstractMigration;
 final class CreateItemTable extends AbstractMigration
 {
     /** @throws InvalidArgumentValueException */
+    #[\Override]
     protected function up(): void
     {
         $this->table('item')
@@ -36,6 +37,7 @@ final class CreateItemTable extends AbstractMigration
             ->create();
     }
 
+    #[\Override]
     protected function down(): void
     {
         $this->table('item')->drop();
